@@ -1,19 +1,19 @@
 import * as React from "react"
 import {
-  closestCenter,
   DndContext,
+  
   KeyboardSensor,
   MouseSensor,
   TouchSensor,
+  
+  closestCenter,
   useSensor,
-  useSensors,
-  type DragEndEvent,
-  type UniqueIdentifier,
+  useSensors
 } from "@dnd-kit/core"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import {
-  arrayMove,
   SortableContext,
+  arrayMove,
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
@@ -33,6 +33,11 @@ import {
   IconTrendingUp,
 } from "@tabler/icons-react"
 import {
+  
+  
+  
+  
+  
   flexRender,
   getCoreRowModel,
   getFacetedRowModel,
@@ -40,26 +45,24 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
-  useReactTable,
-  type ColumnDef,
-  type ColumnFiltersState,
-  type Row,
-  type SortingState,
-  type VisibilityState,
+  useReactTable
 } from "@tanstack/react-table"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 import { toast } from "sonner"
 import { z } from "zod"
+import type {ColumnDef, ColumnFiltersState, Row, SortingState, VisibilityState} from "@tanstack/react-table";
+import type {DragEndEvent, UniqueIdentifier} from "@dnd-kit/core";
 
-import { useIsMobile } from "@/hooks/use-mobile"
+import type {ChartConfig} from "@/components/ui/chart";
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
+  
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
-  type ChartConfig,
+  ChartTooltipContent
 } from "@/components/ui/chart"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Drawer,
@@ -134,7 +137,7 @@ function DragHandle({ id }: { id: number }) {
   )
 }
 
-const columns: ColumnDef<z.infer<typeof schema>>[] = [
+const columns: Array<ColumnDef<z.infer<typeof schema>>> = [
   {
     id: "drag",
     header: () => null,
@@ -337,7 +340,7 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
 export function DataTable({
   data: initialData,
 }: {
-  data: z.infer<typeof schema>[]
+  data: Array<z.infer<typeof schema>>
 }) {
   const [data, setData] = React.useState(() => initialData)
   const [rowSelection, setRowSelection] = React.useState({})
@@ -358,7 +361,7 @@ export function DataTable({
     useSensor(KeyboardSensor, {})
   )
 
-  const dataIds = React.useMemo<UniqueIdentifier[]>(
+  const dataIds = React.useMemo<Array<UniqueIdentifier>>(
     () => data?.map(({ id }) => id) || [],
     [data]
   )

@@ -10,11 +10,22 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthUsersRouteImport } from './routes/_auth/users'
+import { Route as AuthTokoRouteImport } from './routes/_auth/toko'
+import { Route as AuthSetoranRouteImport } from './routes/_auth/setoran'
+import { Route as AuthKeuanganRouteImport } from './routes/_auth/keuangan'
+import { Route as AuthKehadiranRouteImport } from './routes/_auth/kehadiran'
+import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,30 +33,106 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthUsersRoute = AuthUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthTokoRoute = AuthTokoRouteImport.update({
+  id: '/toko',
+  path: '/toko',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSetoranRoute = AuthSetoranRouteImport.update({
+  id: '/setoran',
+  path: '/setoran',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthKeuanganRoute = AuthKeuanganRouteImport.update({
+  id: '/keuangan',
+  path: '/keuangan',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthKehadiranRoute = AuthKehadiranRouteImport.update({
+  id: '/kehadiran',
+  path: '/kehadiran',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthDashboardRoute = AuthDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/dashboard': typeof AuthDashboardRoute
+  '/kehadiran': typeof AuthKehadiranRoute
+  '/keuangan': typeof AuthKeuanganRoute
+  '/setoran': typeof AuthSetoranRoute
+  '/toko': typeof AuthTokoRoute
+  '/users': typeof AuthUsersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/dashboard': typeof AuthDashboardRoute
+  '/kehadiran': typeof AuthKehadiranRoute
+  '/keuangan': typeof AuthKeuanganRoute
+  '/setoran': typeof AuthSetoranRoute
+  '/toko': typeof AuthTokoRoute
+  '/users': typeof AuthUsersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
+  '/_auth/dashboard': typeof AuthDashboardRoute
+  '/_auth/kehadiran': typeof AuthKehadiranRoute
+  '/_auth/keuangan': typeof AuthKeuanganRoute
+  '/_auth/setoran': typeof AuthSetoranRoute
+  '/_auth/toko': typeof AuthTokoRoute
+  '/_auth/users': typeof AuthUsersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/dashboard'
+    | '/kehadiran'
+    | '/keuangan'
+    | '/setoran'
+    | '/toko'
+    | '/users'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login'
-  id: '__root__' | '/' | '/login'
+  to:
+    | '/'
+    | '/login'
+    | '/dashboard'
+    | '/kehadiran'
+    | '/keuangan'
+    | '/setoran'
+    | '/toko'
+    | '/users'
+  id:
+    | '__root__'
+    | '/'
+    | '/_auth'
+    | '/login'
+    | '/_auth/dashboard'
+    | '/_auth/kehadiran'
+    | '/_auth/keuangan'
+    | '/_auth/setoran'
+    | '/_auth/toko'
+    | '/_auth/users'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
 
@@ -58,6 +145,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,11 +159,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth/users': {
+      id: '/_auth/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AuthUsersRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/toko': {
+      id: '/_auth/toko'
+      path: '/toko'
+      fullPath: '/toko'
+      preLoaderRoute: typeof AuthTokoRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/setoran': {
+      id: '/_auth/setoran'
+      path: '/setoran'
+      fullPath: '/setoran'
+      preLoaderRoute: typeof AuthSetoranRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/keuangan': {
+      id: '/_auth/keuangan'
+      path: '/keuangan'
+      fullPath: '/keuangan'
+      preLoaderRoute: typeof AuthKeuanganRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/kehadiran': {
+      id: '/_auth/kehadiran'
+      path: '/kehadiran'
+      fullPath: '/kehadiran'
+      preLoaderRoute: typeof AuthKehadiranRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/dashboard': {
+      id: '/_auth/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthDashboardRouteImport
+      parentRoute: typeof AuthRoute
+    }
   }
 }
 
+interface AuthRouteChildren {
+  AuthDashboardRoute: typeof AuthDashboardRoute
+  AuthKehadiranRoute: typeof AuthKehadiranRoute
+  AuthKeuanganRoute: typeof AuthKeuanganRoute
+  AuthSetoranRoute: typeof AuthSetoranRoute
+  AuthTokoRoute: typeof AuthTokoRoute
+  AuthUsersRoute: typeof AuthUsersRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthDashboardRoute: AuthDashboardRoute,
+  AuthKehadiranRoute: AuthKehadiranRoute,
+  AuthKeuanganRoute: AuthKeuanganRoute,
+  AuthSetoranRoute: AuthSetoranRoute,
+  AuthTokoRoute: AuthTokoRoute,
+  AuthUsersRoute: AuthUsersRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRouteWithChildren,
   LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
