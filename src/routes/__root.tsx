@@ -1,7 +1,7 @@
 import {
   HeadContent,
-  Scripts,
-  createRootRouteWithContext,
+  Link,
+  Scripts, createRootRouteWithContext 
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
@@ -37,7 +37,19 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
     ],
   }),
-
+  notFoundComponent: () => {
+    return (
+      <div className="flex h-screen w-full flex-col items-center justify-center gap-4">
+        <h1 className="text-4xl font-bold">404</h1>
+        <p className="text-muted-foreground">
+          Halaman yang Anda cari tidak ditemukan.
+        </p>
+        <Link to="/" className="text-blue-600 hover:underline">
+          Kembali ke Dashboard
+        </Link>
+      </div>
+    )
+  },
   shellComponent: RootDocument,
 })
 

@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthUsersRouteImport } from './routes/_auth/users'
 import { Route as AuthTokoRouteImport } from './routes/_auth/toko'
 import { Route as AuthSetoranRouteImport } from './routes/_auth/setoran'
+import { Route as AuthProfileRouteImport } from './routes/_auth/profile'
 import { Route as AuthKeuanganRouteImport } from './routes/_auth/keuangan'
 import { Route as AuthKehadiranRouteImport } from './routes/_auth/kehadiran'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
@@ -48,6 +49,11 @@ const AuthSetoranRoute = AuthSetoranRouteImport.update({
   path: '/setoran',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthProfileRoute = AuthProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthKeuanganRoute = AuthKeuanganRouteImport.update({
   id: '/keuangan',
   path: '/keuangan',
@@ -70,6 +76,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthDashboardRoute
   '/kehadiran': typeof AuthKehadiranRoute
   '/keuangan': typeof AuthKeuanganRoute
+  '/profile': typeof AuthProfileRoute
   '/setoran': typeof AuthSetoranRoute
   '/toko': typeof AuthTokoRoute
   '/users': typeof AuthUsersRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthDashboardRoute
   '/kehadiran': typeof AuthKehadiranRoute
   '/keuangan': typeof AuthKeuanganRoute
+  '/profile': typeof AuthProfileRoute
   '/setoran': typeof AuthSetoranRoute
   '/toko': typeof AuthTokoRoute
   '/users': typeof AuthUsersRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/_auth/dashboard': typeof AuthDashboardRoute
   '/_auth/kehadiran': typeof AuthKehadiranRoute
   '/_auth/keuangan': typeof AuthKeuanganRoute
+  '/_auth/profile': typeof AuthProfileRoute
   '/_auth/setoran': typeof AuthSetoranRoute
   '/_auth/toko': typeof AuthTokoRoute
   '/_auth/users': typeof AuthUsersRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/kehadiran'
     | '/keuangan'
+    | '/profile'
     | '/setoran'
     | '/toko'
     | '/users'
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/kehadiran'
     | '/keuangan'
+    | '/profile'
     | '/setoran'
     | '/toko'
     | '/users'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
     | '/_auth/dashboard'
     | '/_auth/kehadiran'
     | '/_auth/keuangan'
+    | '/_auth/profile'
     | '/_auth/setoran'
     | '/_auth/toko'
     | '/_auth/users'
@@ -180,6 +192,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSetoranRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/profile': {
+      id: '/_auth/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthProfileRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/keuangan': {
       id: '/_auth/keuangan'
       path: '/keuangan'
@@ -208,6 +227,7 @@ interface AuthRouteChildren {
   AuthDashboardRoute: typeof AuthDashboardRoute
   AuthKehadiranRoute: typeof AuthKehadiranRoute
   AuthKeuanganRoute: typeof AuthKeuanganRoute
+  AuthProfileRoute: typeof AuthProfileRoute
   AuthSetoranRoute: typeof AuthSetoranRoute
   AuthTokoRoute: typeof AuthTokoRoute
   AuthUsersRoute: typeof AuthUsersRoute
@@ -217,6 +237,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthDashboardRoute: AuthDashboardRoute,
   AuthKehadiranRoute: AuthKehadiranRoute,
   AuthKeuanganRoute: AuthKeuanganRoute,
+  AuthProfileRoute: AuthProfileRoute,
   AuthSetoranRoute: AuthSetoranRoute,
   AuthTokoRoute: AuthTokoRoute,
   AuthUsersRoute: AuthUsersRoute,

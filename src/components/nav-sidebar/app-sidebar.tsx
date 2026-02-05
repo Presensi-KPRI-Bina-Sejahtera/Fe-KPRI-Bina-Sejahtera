@@ -86,28 +86,31 @@ export function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
+              asChild
               size="lg"
               className="group-data-[collapsible=icon]:!p-1 hover:bg-slate-100"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border">
-                <Avatar className="h-full w-full">
-                  <AvatarImage
-                    src="/office.png"
-                    alt="User"
-                    className="object-cover"
-                  />
-                  <AvatarFallback>AH</AvatarFallback>
-                </Avatar>
-              </div>
+              <Link to="/profile">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full border">
+                  <Avatar className="h-full w-full">
+                    <AvatarImage
+                      src="/office.png"
+                      alt="User"
+                      className="object-cover"
+                    />
+                    <AvatarFallback>AH</AvatarFallback>
+                  </Avatar>
+                </div>
 
-              <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                <span className="truncate font-semibold">
-                  Afif Habiburrahman
-                </span>
-                <span className="truncate text-xs text-muted-foreground">
-                  afif@example.com
-                </span>
-              </div>
+                <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
+                  <span className="truncate font-semibold">
+                    Afif Habiburrohman
+                  </span>
+                  <span className="truncate text-xs text-muted-foreground">
+                    afif@example.com
+                  </span>
+                </div>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
 

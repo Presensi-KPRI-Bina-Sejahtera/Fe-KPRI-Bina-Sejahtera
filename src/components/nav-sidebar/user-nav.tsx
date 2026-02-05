@@ -25,7 +25,7 @@ import { Button } from "@/components/ui/button"
 
 export function UserNav() {
   const user = {
-    name: "Afif Habiburrahman",
+    name: "Afif Habiburrohman",
     email: "afif@example.com",
     avatar: "/office.png",
   }
