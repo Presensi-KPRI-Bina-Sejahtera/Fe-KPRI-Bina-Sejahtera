@@ -77,11 +77,11 @@ export function TokoEditDialog() {
         </div>
 
         <DialogFooter>
-          <Button variant="destructive" className="w-[50%]" onClick={() => setOpen(false)}>
+          <Button variant="destructive" className="md:w-[50%] w-full h-12" onClick={() => setOpen(false)}>
             Batal
           </Button>
-          <Button className="w-[50%] bg-slate-900 text-white hover:bg-slate-800">
-            Tambah Toko
+          <Button className="md:w-[50%] w-full bg-slate-900 text-white hover:bg-slate-800 h-12">
+            Edit Toko
           </Button>
         </DialogFooter>
       </DialogContent>

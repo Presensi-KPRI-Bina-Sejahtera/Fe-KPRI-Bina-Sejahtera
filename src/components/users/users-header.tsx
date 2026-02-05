@@ -10,7 +10,7 @@ export function UsersHeader() {
           Kelola hak akses pengguna aplikasi
         </p>
       </div>
-      <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2">
+      <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2 h-12">
         <Plus className="h-4 w-4" />
         Tambah User
       </Button>

@@ -25,7 +25,7 @@ export function SetoranFilters() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6 md:gap-12 pt-2 border-t border-dashed">
+          <div className="grid md:grid-cols-2 grid-cols-1 gap-6 md:gap-12 pt-2 border-t border-dashed">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Filter className="h-4 w-4" />

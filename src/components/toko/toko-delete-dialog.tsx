@@ -31,10 +31,10 @@ export function TokoDeleteDialog() {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2 mt-2">
-          <Button variant="outline" className="w-[50%] bg-slate-800 text-white hover:bg-slate-900 hover:text-white border-0" onClick={() => setOpen(false)}>
+          <Button variant="outline" className="md:w-[50%] w-full bg-slate-800 text-white hover:bg-slate-900 hover:text-white border-0 h-12" onClick={() => setOpen(false)}>
             Batal
           </Button>
-          <Button className="w-[50%] bg-rose-600 text-white hover:bg-rose-700">
+          <Button className="md:w-[50%] w-full bg-rose-600 text-white hover:bg-rose-700 h-12">
             Ya, Hapus
           </Button>
         </DialogFooter>

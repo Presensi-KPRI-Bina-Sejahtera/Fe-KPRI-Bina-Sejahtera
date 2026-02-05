@@ -87,7 +87,7 @@ export function ChartBarMultiple() {
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex justify-center gap-6">
+      <CardFooter className="flex justify-center gap-6 pb-4">
         <div className="flex items-center gap-2">
           <div className="h-3 w-3 bg-red-500" />
           <span className="text-sm font-medium text-red-500">Pengeluaran</span>

@@ -21,7 +21,7 @@ export function TokoAddDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2 shadow-lg">
+        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2 shadow-lg h-12">
           <Plus className="h-4 w-4" />
           Tambah Toko
         </Button>
@@ -76,10 +76,10 @@ export function TokoAddDialog() {
         </div>
 
         <DialogFooter>
-          <Button variant="destructive" className="w-[50%]" onClick={() => setOpen(false)}>
+          <Button variant="destructive" className="md:w-[50%] w-full h-12" onClick={() => setOpen(false)}>
             Batal
           </Button>
-          <Button className="w-[50%] bg-slate-900 text-white hover:bg-slate-800">
+          <Button className="md:w-[50%] w-full bg-slate-900 text-white hover:bg-slate-800 h-12">
             Tambah Toko
           </Button>
         </DialogFooter>

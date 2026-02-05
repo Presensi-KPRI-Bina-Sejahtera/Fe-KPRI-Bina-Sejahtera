@@ -154,7 +154,7 @@ export function ActivitiesTable() {
   })
 
   return (
-    <Card className="shadow-lg my-0 pt-4 gap-0 border-slate-200">
+    <Card className="shadow-lg my-0 pt-4 gap-0 border-3 border-slate-200">
       <CardHeader className="border-b border-slate-100 py-0 pb-4">
         <CardTitle className="text-2xl font-bold">Aktivitas Terkini (Pulang & Setoran)</CardTitle>
       </CardHeader>
