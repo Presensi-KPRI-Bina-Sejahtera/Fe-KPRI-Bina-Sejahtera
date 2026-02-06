@@ -2,14 +2,13 @@ import * as React from "react"
 import {
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, Calendar, ChevronLeft, ChevronRight } from "lucide-react"
-import type {
-  ColumnDef,
-  SortingState} from "@tanstack/react-table";
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useNavigate } from "@tanstack/react-router"
+import { ArrowUpDown, Calendar, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
+import type { ColumnDef, SortingState } from "@tanstack/react-table"
 
 import {
   Table,
@@ -31,31 +30,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { DepositRecord, verifyDeposit } from "@/services/depositService"
+import { toast } from "sonner"
 
-type SetoranRecord = {
-  id: string
-  name: string
-  avatar: string
-  date: string
-  inputBy: { name: string; avatar: string }
-  type: "Simpanan" | "Angsuran"
-  amount: number
-  verificationCode: string | null
+interface SetoranTableProps {
+  data: DepositRecord[]
+  pagination: {
+    pageIndex: number
+    pageSize: number
+    pageCount: number
+    total: number
+  }
 }
-
-const data: Array<SetoranRecord> = Array.from({ length: 50 }, (_, i) => ({
-  id: `${i + 1}`,
-  name: i % 2 === 0 ? "Alice Smith" : "Bob Johnson",
-  avatar: i % 2 === 0 ? "/avatars/alice.jpg" : "/avatars/bob.jpg",
-  date: "2023-10-25",
-  inputBy: {
-    name: i % 3 === 0 ? "Admin" : "Teller",
-    avatar: "/avatars/default.jpg",
-  },
-  type: i % 3 === 0 ? "Angsuran" : "Simpanan",
-  amount: 500000,
-  verificationCode: i % 2 === 0 ? "VER-001" : null,
-}))
 
 const formatRp = (val: number) => {
   return new Intl.NumberFormat("id-ID", {
@@ -66,18 +52,67 @@ const formatRp = (val: number) => {
   }).format(val)
 }
 
-const columns: Array<ColumnDef<SetoranRecord>> = [
+const VerificationCell = ({ row }: { row: DepositRecord }) => {
+  const queryClient = useQueryClient()
+  const [code, setCode] = React.useState("")
+
+  const mutation = useMutation({
+    mutationFn: (newCode: string) => verifyDeposit(row.id, newCode),
+    onSuccess: () => {
+      toast.success("Setoran berhasil diverifikasi")
+      queryClient.invalidateQueries({ queryKey: ["deposit"] })
+    },
+    onError: () => {
+      toast.error("Gagal memverifikasi setoran")
+    },
+  })
+
+  if (row.verified_key) {
+    return (
+      <div className="w-full max-w-[120px] truncate bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-mono py-1.5 px-3 rounded text-center mx-auto font-bold">
+        {row.verified_key}
+      </div>
+    )
+  }
+
+  return (
+    <div className="relative max-w-[140px] mx-auto">
+      <Input 
+        placeholder="Input Kode..." 
+        className="h-8 text-xs bg-white pr-8"
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        disabled={mutation.isPending}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && code.trim()) {
+            mutation.mutate(code)
+          }
+        }}
+      />
+      {mutation.isPending && (
+        <div className="absolute right-2 top-2">
+          <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+        </div>
+      )}
+    </div>
+  )
+}
+
+const columns: Array<ColumnDef<DepositRecord>> = [
   {
     id: "index",
     header: "No.",
-    cell: ({ row }) => (
-      <span className="text-muted-foreground font-medium">
-        {row.index + 1}.
-      </span>
-    ),
+    cell: ({ row, table }) => {
+      const index = row.index + 1 + (table.getState().pagination.pageIndex * table.getState().pagination.pageSize)
+      return (
+        <span className="text-muted-foreground font-medium">
+          {index}.
+        </span>
+      )
+    },
   },
   {
-    accessorKey: "name",
+    accessorKey: "for_name", 
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -91,12 +126,11 @@ const columns: Array<ColumnDef<SetoranRecord>> = [
     cell: ({ row }) => (
       <div className="flex items-center gap-3">
         <Avatar className="h-8 w-8 border border-slate-200">
-          <AvatarImage src={row.original.avatar} />
           <AvatarFallback className="bg-slate-100 text-slate-600 font-medium">
-            {row.original.name.charAt(0)}
+            {row.original.for_name.charAt(0)}
           </AvatarFallback>
         </Avatar>
-        <span className="font-semibold text-slate-900 text-sm">{row.original.name}</span>
+        <span className="font-semibold text-slate-900 text-sm">{row.original.for_name}</span>
       </div>
     ),
   },
@@ -111,7 +145,7 @@ const columns: Array<ColumnDef<SetoranRecord>> = [
     ),
   },
   {
-    accessorKey: "inputBy",
+    accessorKey: "user.name", 
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -122,26 +156,31 @@ const columns: Array<ColumnDef<SetoranRecord>> = [
         <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground" />
       </Button>
     ),
-    cell: ({ row }) => (
-      <div className="flex items-center gap-3">
-        <Avatar className="h-8 w-8 border border-slate-200">
-          <AvatarImage src={row.original.inputBy.avatar} />
-          <AvatarFallback className="bg-slate-100 text-slate-600 font-medium">
-            {row.original.inputBy.name.charAt(0)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col text-left">
-          <span className="font-semibold text-slate-900 text-sm">{row.original.inputBy.name}</span>
-          <span className="text-xs text-muted-foreground">@{row.original.inputBy.name.toLowerCase().replace(' ', '')}</span>
+    cell: ({ row }) => {
+      const employee = row.original.user
+      return (
+        <div className="flex items-center gap-3">
+          <Avatar className="h-8 w-8 border border-slate-200">
+            <AvatarImage src={employee.profile_image || ""} />
+            <AvatarFallback className="bg-slate-100 text-slate-600 font-medium">
+              {employee.name.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col text-left">
+            <span className="font-semibold text-slate-900 text-sm">{employee.name}</span>
+            <span className="text-xs text-muted-foreground">@{employee.username}</span>
+          </div>
         </div>
-      </div>
-    ),
+      )
+    },
   },
   {
     accessorKey: "type",
     header: "Tipe",
     cell: ({ row }) => {
-      const isSimpanan = row.original.type === "Simpanan"
+      const isSimpanan = row.original.type === "simpanan"
+      const label = row.original.type.charAt(0).toUpperCase() + row.original.type.slice(1)
+      
       return (
         <Badge 
           variant="outline" 
@@ -151,65 +190,66 @@ const columns: Array<ColumnDef<SetoranRecord>> = [
               : "bg-purple-50 text-purple-600 border-purple-200"
           }`}
         >
-          {row.original.type}
+          {label}
         </Badge>
       )
     },
   },
   {
-    accessorKey: "amount",
+    accessorKey: "value",
     header: "Jumlah",
     cell: ({ row }) => (
       <span className="font-bold text-emerald-600">
-        {formatRp(row.original.amount)}
+        {formatRp(row.original.value)}
       </span>
     ),
   },
   {
-    accessorKey: "verificationCode",
+    accessorKey: "verified_key",
     header: "Kode Verifikasi",
-    cell: ({ row }) => {
-      const code = row.original.verificationCode
-      if (code) {
-        return (
-          <div className="w-full max-w-[120px] bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-mono py-1.5 px-3 rounded text-center mx-auto">
-            {code}
-          </div>
-        )
-      }
-      return (
-        <Input 
-          placeholder="Input Kode" 
-          className="h-8 text-xs bg-white max-w-32"
-        />
-      )
-    },
+    cell: ({ row }) => <VerificationCell row={row.original} />,
   },
 ]
 
-export function SetoranTable() {
+export function SetoranTable({ data, pagination }: SetoranTableProps) {
+  const navigate = useNavigate()
   const [sorting, setSorting] = React.useState<SortingState>([])
+
+  const handlePageChange = (newPageIndex: number) => {
+    navigate({
+      to: '/setoran',
+      search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
+      replace: true,
+    })
+  }
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    navigate({
+      to: '/setoran',
+      search: (prev: any) => ({ ...prev, per_page: newPageSize, page: 1 }),
+      replace: true,
+    })
+  }
 
   const table = useReactTable({
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
+    pageCount: pagination.pageCount,
     state: {
       sorting,
+      pagination: {
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+      },
     },
-    initialState: {
-        pagination: {
-            pageSize: 10
-        }
-    }
+    manualPagination: true,
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   })
 
-  const pageIndex = table.getState().pagination.pageIndex
-  const pageCount = table.getPageCount()
-  
+  const pageIndex = pagination.pageIndex
+  const pageCount = pagination.pageCount
   const getPageNumbers = () => {
     const pages = []
     const maxVisible = 5
@@ -259,32 +299,39 @@ export function SetoranTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} className="hover:bg-slate-50">
-                {row.getVisibleCells().map((cell, index) => {
-                  let alignClass = "text-center"
-                  if (index === 1 || index === 3) alignClass = "text-left"
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} className="hover:bg-slate-50">
+                  {row.getVisibleCells().map((cell, index) => {
+                    let alignClass = "text-center"
+                    if (index === 1 || index === 3) alignClass = "text-left"
 
-                  return (
-                    <TableCell key={cell.id} className={`py-3 ${alignClass}`}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  )
-                })}
+                    return (
+                      <TableCell key={cell.id} className={`py-3 ${alignClass}`}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  Tidak ada data setoran.
+                </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
         </div>
 
         <div className="flex items-center justify-center p-4 border-t">
-          
           <div className="grid md:grid-cols-2 grid-cols-1 gap-6">
             <div className="flex items-center gap-2">
                 <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => table.previousPage()}
+                    onClick={() => handlePageChange(pageIndex - 1)}
                     disabled={!table.getCanPreviousPage()}
                 >
                     <ChevronLeft className="h-4 w-4" />
@@ -299,7 +346,7 @@ export function SetoranTable() {
                       variant={pageIndex === idx ? "secondary" : "ghost"}
                       size="sm"
                       className={`h-8 w-8 font-bold ${pageIndex === idx ? "text-slate-900" : "text-muted-foreground"}`}
-                      onClick={() => table.setPageIndex(idx)}
+                      onClick={() => handlePageChange(idx)}
                     >
                       {idx + 1}
                     </Button>
@@ -309,7 +356,7 @@ export function SetoranTable() {
                 <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => table.nextPage()}
+                    onClick={() => handlePageChange(pageIndex + 1)}
                     disabled={!table.getCanNextPage()}
                 >
                     <ChevronRight className="h-4 w-4" />
@@ -317,13 +364,11 @@ export function SetoranTable() {
             </div>
 
             <Select
-                value={`${table.getState().pagination.pageSize}`}
-                onValueChange={(value) => {
-                  table.setPageSize(Number(value))
-                }}
+                value={`${pagination.pageSize}`}
+                onValueChange={(value) => handlePageSizeChange(Number(value))}
             >
                 <SelectTrigger className="h-8 md:w-27.5 w-auto bg-slate-100 border-none">
-                    <SelectValue placeholder={`${table.getState().pagination.pageSize} / Page`} />
+                    <SelectValue placeholder={`${pagination.pageSize} / Page`} />
                 </SelectTrigger>
                 <SelectContent side="top">
                     {[10, 20, 30, 40, 50].map((pageSize) => (
