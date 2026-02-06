@@ -9,7 +9,6 @@ import {
 import type { DashboardStats } from '@/services/dashboardService'
 import { Card, CardContent } from '@/components/ui/card'
 
-// Helper to format currency
 const formatRp = (val: number) => {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -19,7 +18,6 @@ const formatRp = (val: number) => {
   }).format(val)
 }
 
-// Helper to format percentage
 const formatPercent = (val: number) => `${Math.abs(val).toFixed(1)}%`
 
 export function SectionCards({ stats }: { stats?: DashboardStats['statistik'] }) {
@@ -27,7 +25,7 @@ export function SectionCards({ stats }: { stats?: DashboardStats['statistik'] })
 
   const items = [
     {
-      label: 'Pemasukan Bulan Ini',
+      label: 'Pemasukan',
       value: formatRp(stats.pemasukan.total),
       footerText: `${formatPercent(stats.pemasukan.change)} dari bulan lalu`,
       footerTextColor: stats.pemasukan.change >= 0 ? 'text-emerald-600' : 'text-rose-600',
@@ -37,7 +35,7 @@ export function SectionCards({ stats }: { stats?: DashboardStats['statistik'] })
       iconBg: 'bg-emerald-50',
     },
     {
-      label: 'Pengeluaran Bulan Ini',
+      label: 'Pengeluaran',
       value: formatRp(stats.pengeluaran.total),
       footerText: `${formatPercent(stats.pengeluaran.change)} dari bulan lalu`,
       footerTextColor: stats.pengeluaran.change <= 0 ? 'text-emerald-600' : 'text-rose-600',
@@ -47,7 +45,7 @@ export function SectionCards({ stats }: { stats?: DashboardStats['statistik'] })
       iconBg: 'bg-rose-50',
     },
     {
-      label: 'Total Setoran Bulan Ini',
+      label: 'Total Setoran',
       value: formatRp(stats.deposit.total),
       isSpecial: true,
       subValue: `${stats.deposit.person} Anggota`,
@@ -68,18 +66,22 @@ export function SectionCards({ stats }: { stats?: DashboardStats['statistik'] })
   ]
 
   return (
+    <div className='space-y-4'>
+      <h2 className="text-2xl font-bold text-slate-900 mb-2">Ringkasan Bulan ini</h2>
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {items.map((item, index) => (
         <Card key={index} className="shadow-lg border-3 border-slate-200">
           <CardContent className="px-6 py-6 flex items-center justify-between">
             <div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-slate-500">
-                  {item.label}
-                </p>
-                <h3 className="text-2xl font-bold text-slate-900">
-                  {item.value}
-                </h3>
+              <div className="flex justify-between items-start">
+                <div className="space-y-1">
+                  <p className="text-sm 2xl:text-md font-medium text-slate-500">
+                    {item.label}
+                  </p>
+                  <h3 className="text-xl 2xl:text-4xl font-bold text-slate-900">
+                    {item.value}
+                  </h3>
+                </div>
               </div>
 
               <div className="mt-4 flex items-center gap-1 text-xs font-medium">
@@ -98,12 +100,16 @@ export function SectionCards({ stats }: { stats?: DashboardStats['statistik'] })
                 )}
               </div>
             </div>
-            <div className={`p-3 rounded-full ${item.iconBg} ${item.iconColor}`}>
-              <item.icon className="w-6 h-6" />
+            <div
+              className={`p-3 2xl:p-4 rounded-full ${item.iconBg} ${item.iconColor}`}
+            >
+              <item.icon className="size-6 2xl:size-8" />
             </div>
           </CardContent>
         </Card>
       ))}
-    </div>
+      </div>
+          </div>
+
   )
 }

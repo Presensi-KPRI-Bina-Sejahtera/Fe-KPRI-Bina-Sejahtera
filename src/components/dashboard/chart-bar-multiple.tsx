@@ -17,7 +17,6 @@ import {
   ChartTooltipContent
 } from "@/components/ui/chart"
 
-// 🟢 Default days fallback since API labels might be empty
 const DEFAULT_DAYS = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
 
 const chartConfig = {
@@ -31,14 +30,10 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-// 🟢 Update component to accept props
 export function ChartBarMultiple({ chartData }: { chartData?: DashboardStats['grafik'] }) {
   
-  // 🟢 Transform API data to Recharts format
-  // If no data is passed yet, default to empty to prevent crashes
   const processedData = DEFAULT_DAYS.map((day, index) => ({
     day: day,
-    // Safely access the index, default to 0 if missing
     pemasukan: chartData?.cashflows.pemasukan[index] ?? 0,
     pengeluaran: chartData?.cashflows.pengeluaran[index] ?? 0,
   }))
@@ -46,8 +41,8 @@ export function ChartBarMultiple({ chartData }: { chartData?: DashboardStats['gr
   return (
     <Card className="h-full shadow-lg border-3 border-slate-200 pb-0">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-2xl font-bold text-slate-900">
-          Pemasukan & Pengeluaran (Minggu Ini)
+        <CardTitle className="text-2xl  font-bold text-slate-900">
+          Pemasukan & Pengeluaran Seminggu
         </CardTitle>
         <a href="#" className="text-sm font-medium text-blue-600 hover:underline">
           Lihat Detail
