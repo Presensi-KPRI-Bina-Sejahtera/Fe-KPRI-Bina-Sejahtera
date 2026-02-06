@@ -31,26 +31,39 @@ export type AttendanceResponse = {
   total: number
   start_date: string
   end_date: string
-  
+
   summary: {
     work_hours_avg_perperson: number
     work_hours_avg_perperson_perday: number
   }
-  
+
   attendances: Array<AttendanceRecord>
+}
+
+export type UserDropdownItem = {
+  id: number
+  name: string
 }
 
 export const getAttendanceList = async (params: AttendanceParams) => {
   const cleanParams = Object.fromEntries(
-    Object.entries(params).filter(([_, v]) => v != null && v !== '')
+    Object.entries(params).filter(([_, v]) => v != null && v !== ''),
   )
 
-  const response = await api.get<{ status: string; message: string; data: AttendanceResponse }>(
-    '/admin/attendance', 
-    {
-      params: cleanParams
-    }
+  const response = await api.get<{
+    status: string
+    message: string
+    data: AttendanceResponse
+  }>('/admin/attendance', {
+    params: cleanParams,
+  })
+
+  return response.data.data
+}
+
+export const getUserDropdownList = async () => {
+  const response = await api.get<{ data: Array<UserDropdownItem> }>(
+    '/admin/user/dropdown',
   )
-  
   return response.data.data
 }
