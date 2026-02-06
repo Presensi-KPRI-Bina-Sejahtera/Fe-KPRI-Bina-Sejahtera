@@ -2,15 +2,14 @@ import * as React from "react"
 import {
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
 import { ArrowUpDown, Calendar, ChevronLeft, ChevronRight } from "lucide-react"
-import type {
-  ColumnDef,
-  SortingState} from "@tanstack/react-table";
+import { useNavigate } from "@tanstack/react-router"
+import type { ColumnDef, SortingState } from "@tanstack/react-table"
 
+import type { AttendanceRecord } from "@/services/attendanceService"
 import {
   Table,
   TableBody,
@@ -31,40 +30,31 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-type AttendanceRecord = {
-  id: string
-  name: string
-  username: string
-  avatar: string
-  date: string
-  checkIn: string
-  checkOut: string
-  totalHours: string
+interface KehadiranTableProps {
+  data: Array<AttendanceRecord>
+  pagination: {
+    pageIndex: number
+    pageSize: number
+    pageCount: number
+    total: number
+  }
 }
-
-const data: Array<AttendanceRecord> = Array.from({ length: 150 }, (_, i) => ({
-  id: `${i + 1}`,
-  name: i % 2 === 0 ? "Alice Smith" : "Bob Johnson",
-  username: i % 2 === 0 ? "@alicesmith" : "@bobjohnson",
-  avatar: i % 2 === 0 ? "/avatars/alice.jpg" : "/avatars/bob.jpg",
-  date: "2023-10-25",
-  checkIn: "08:00",
-  checkOut: "17:00",
-  totalHours: i % 3 === 0 ? "8 Jam 50 Menit" : "9 Jam",
-}))
 
 const columns: Array<ColumnDef<AttendanceRecord>> = [
   {
     id: "index",
     header: "No.",
-    cell: ({ row }) => (
-      <span className="text-muted-foreground font-medium">
-        {row.index + 1}.
-      </span>
-    ),
+    cell: ({ row, table }) => {
+      const index = row.index + 1 + (table.getState().pagination.pageIndex * table.getState().pagination.pageSize)
+      return (
+        <span className="text-muted-foreground font-medium">
+          {index}.
+        </span>
+      )
+    },
   },
   {
-    accessorKey: "name",
+    accessorKey: "user.name",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -75,20 +65,23 @@ const columns: Array<ColumnDef<AttendanceRecord>> = [
         <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground" />
       </Button>
     ),
-    cell: ({ row }) => (
-      <div className="flex items-center gap-3">
-        <Avatar className="h-9 w-9 border border-slate-200">
-          <AvatarImage src={row.original.avatar} />
-          <AvatarFallback className="bg-orange-100 text-orange-600 font-medium">
-            {row.original.name.charAt(0)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col">
-          <span className="font-semibold text-slate-900 text-sm">{row.original.name}</span>
-          <span className="text-xs text-muted-foreground">{row.original.username}</span>
+    cell: ({ row }) => {
+      const user = row.original.user
+      return (
+        <div className="flex items-center gap-3">
+          <Avatar className="h-9 w-9 border border-slate-200">
+            <AvatarImage src={user.profile_image || ""} />
+            <AvatarFallback className="bg-orange-100 text-orange-600 font-medium">
+              {user.name.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
+            <span className="font-semibold text-slate-900 text-sm">{user.name}</span>
+            <span className="text-xs text-muted-foreground">@{user.username}</span>
+          </div>
         </div>
-      </div>
-    ),
+      )
+    },
   },
   {
     accessorKey: "date",
@@ -101,56 +94,73 @@ const columns: Array<ColumnDef<AttendanceRecord>> = [
     ),
   },
   {
-    accessorKey: "checkIn",
+    accessorKey: "jam_masuk",
     header: "Jam Masuk",
     cell: ({ row }) => (
       <span className="font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded text-xs border border-emerald-100">
-        {row.original.checkIn}
+        {row.original.jam_masuk}
       </span>
     ),
   },
   {
-    accessorKey: "checkOut",
+    accessorKey: "jam_pulang",
     header: "Jam Pulang",
     cell: ({ row }) => (
       <span className="font-semibold text-rose-600 bg-rose-50 px-2 py-1 rounded text-xs border border-rose-100">
-        {row.original.checkOut}
+        {row.original.jam_pulang}
       </span>
     ),
   },
   {
-    accessorKey: "totalHours",
+    accessorKey: "work_duration_text",
     header: "Total Jam Kerja",
     cell: ({ row }) => (
       <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-50">
-        {row.original.totalHours}
+        {row.original.work_duration_text}
       </Badge>
     ),
   },
 ]
 
-export function KehadiranTable() {
+export function KehadiranTable({ data, pagination }: KehadiranTableProps) {
+  const navigate = useNavigate()
   const [sorting, setSorting] = React.useState<SortingState>([])
+
+  const handlePageChange = (newPageIndex: number) => {
+    navigate({
+      to: '/kehadiran',
+      search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
+      replace: true,
+    })
+  }
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    navigate({
+      to: '/kehadiran',
+      search: (prev: any) => ({ ...prev, per_page: newPageSize, page: 1 }),
+      replace: true,
+    })
+  }
 
   const table = useReactTable({
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
+    pageCount: pagination.pageCount,
     state: {
       sorting,
+      pagination: {
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+      },
     },
-    initialState: {
-        pagination: {
-            pageSize: 10
-        }
-    }
+    manualPagination: true,
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   })
 
-  const pageIndex = table.getState().pagination.pageIndex
-  const pageCount = table.getPageCount()
+  const pageIndex = pagination.pageIndex
+  const pageCount = pagination.pageCount
   
   const getPageNumbers = () => {
     const pages = []
@@ -203,29 +213,38 @@ export function KehadiranTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} className="hover:bg-slate-50 border-b border-slate-100">
-                {row.getVisibleCells().map((cell, index) => {
-                  let alignClass = "text-center"
-                  if (index === 1) alignClass = "text-left"
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} className="hover:bg-slate-50 border-b border-slate-100">
+                  {row.getVisibleCells().map((cell, index) => {
+                    let alignClass = "text-center"
+                    if (index === 1) alignClass = "text-left"
 
-                  return (
-                    <TableCell key={cell.id} className={`py-4 ${alignClass}`}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  )
-                })}
+                    return (
+                      <TableCell key={cell.id} className={`py-4 ${alignClass}`}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+              ))
+            ) : (
+               <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  Tidak ada data kehadiran.
+                </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
+
         <div className="flex items-center justify-center p-4 border-t">
           <div className="grid md:grid-cols-2 grid-cols-1 gap-6">
             <div className="flex items-center gap-2">
                 <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => table.previousPage()}
+                    onClick={() => handlePageChange(pageIndex - 1)}
                     disabled={!table.getCanPreviousPage()}
                 >
                     <ChevronLeft className="h-4 w-4" />
@@ -240,7 +259,7 @@ export function KehadiranTable() {
                       variant={pageIndex === idx ? "secondary" : "ghost"}
                       size="sm"
                       className={`h-8 w-8 font-bold ${pageIndex === idx ? "text-slate-900" : "text-muted-foreground"}`}
-                      onClick={() => table.setPageIndex(idx)}
+                      onClick={() => handlePageChange(idx)}
                     >
                       {idx + 1}
                     </Button>
@@ -250,7 +269,7 @@ export function KehadiranTable() {
                 <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => table.nextPage()}
+                    onClick={() => handlePageChange(pageIndex + 1)}
                     disabled={!table.getCanNextPage()}
                 >
                     <ChevronRight className="h-4 w-4" />
@@ -258,13 +277,11 @@ export function KehadiranTable() {
             </div>
 
             <Select
-                value={`${table.getState().pagination.pageSize}`}
-                onValueChange={(value) => {
-                  table.setPageSize(Number(value))
-                }}
+                value={`${pagination.pageSize}`}
+                onValueChange={(value) => handlePageSizeChange(Number(value))}
             >
                 <SelectTrigger className="h-8 md:w-27.5 w-auto bg-slate-100 border-none">
-                    <SelectValue placeholder={table.getState().pagination.pageSize} />
+                    <SelectValue placeholder={pagination.pageSize} />
                 </SelectTrigger>
                 <SelectContent side="top">
                     {[10, 20, 30, 40, 50].map((pageSize) => (

@@ -1,6 +1,10 @@
-import { Calendar, Search, User } from "lucide-react"
+import { useEffect, useState } from "react"
+import { useNavigate } from "@tanstack/react-router"
+import { Calendar, Search, User, X } from "lucide-react"
+import type { AttendanceParams } from "@/services/attendanceService"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
@@ -10,15 +14,50 @@ import {
 } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 
-export function KehadiranFilters() {
+export function KehadiranFilters({ currentFilters }: { currentFilters: AttendanceParams }) {
+  const navigate = useNavigate()
+
+  const [filters, setFilters] = useState(currentFilters)
+
+  useEffect(() => {
+    setFilters(currentFilters)
+  }, [currentFilters])
+
+  const applyFilter = (key: keyof AttendanceParams, value: any) => {
+    const newFilters = { ...filters, [key]: value }
+    setFilters(newFilters)
+
+    navigate({
+      to: '/kehadiran',
+      search: { 
+        ...newFilters, 
+        page: 1,
+        per_page: newFilters.per_page ?? 10 
+      },
+      replace: true,
+    })
+  }
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      applyFilter('search', filters.search)
+    }
+  }
+
   return (
     <Card className="border-3 border-slate-200 shadow-lg">
-      <CardContent className="px-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+      <CardContent className="px-6 py-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+        
         <div className="space-y-2">
           <Label className="text-sm text-muted-foreground">Tanggal Mulai</Label>
           <div className="relative">
             <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input type="date" className="pl-9" />
+            <Input 
+              type="date" 
+              className="pl-9" 
+              value={filters.start_date || ''}
+              onChange={(e) => applyFilter('start_date', e.target.value)}
+            />
           </div>
         </div>
 
@@ -26,21 +65,30 @@ export function KehadiranFilters() {
           <Label className="text-sm text-muted-foreground">Tanggal Selesai</Label>
           <div className="relative">
             <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input type="date" className="pl-9" />
+            <Input 
+              type="date" 
+              className="pl-9" 
+              value={filters.end_date || ''}
+              onChange={(e) => applyFilter('end_date', e.target.value)}
+            />
           </div>
         </div>
 
         <div className="space-y-2">
           <Label className="text-sm text-muted-foreground">Filter Pegawai</Label>
-          <Select>
+          <Select 
+            value={filters.user_id || "all"} 
+            onValueChange={(val) => applyFilter('user_id', val === "all" ? undefined : val)}
+          >
             <SelectTrigger className="pl-9 relative w-full">
               <User className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <SelectValue placeholder="Semua Pegawai" />
             </SelectTrigger>
+            {/* Ini masih perlu diubah */}
             <SelectContent>
               <SelectItem value="all">Semua Pegawai</SelectItem>
-              <SelectItem value="it">IT Dept</SelectItem>
-              <SelectItem value="hr">HR Dept</SelectItem>
+              <SelectItem value="2">Employee One</SelectItem>
+              <SelectItem value="7">Catetan Saja</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -49,9 +97,27 @@ export function KehadiranFilters() {
           <Label className="text-sm text-muted-foreground">Cari Data</Label>
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Cari nama..." className="pl-9" />
+            <Input 
+              placeholder="Cari nama..." 
+              className="pl-9" 
+              value={filters.search || ''}
+              onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+              onBlur={() => applyFilter('search', filters.search)}
+              onKeyDown={handleSearchKeyDown}
+            />
+            {filters.search && (
+               <Button 
+                 variant="ghost" 
+                 size="icon" 
+                 className="absolute right-1 top-1 h-7 w-7"
+                 onClick={() => applyFilter('search', '')}
+               >
+                 <X className="h-3 w-3" />
+               </Button>
+            )}
           </div>
         </div>
+
       </CardContent>
     </Card>
   )
