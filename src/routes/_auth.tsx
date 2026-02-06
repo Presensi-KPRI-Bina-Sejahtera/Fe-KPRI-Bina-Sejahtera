@@ -51,7 +51,7 @@ function AuthLayout() {
           <div className="absolute bottom-0 left-0 right-0 mx-4 border-b-2 border-slate-200" />
         </header>
 
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0 overflow-x-hidden">
           <Outlet />
         </div>
       </SidebarInset>

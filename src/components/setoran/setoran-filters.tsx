@@ -12,12 +12,12 @@ export function SetoranFilters() {
           
           <div className="space-y-2">
             <Label className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Rentang Tanggal</Label>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="relative w-full">
                 <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input type="date" className="pl-10" />
               </div>
-              <span className="text-muted-foreground">-</span>
+              <span className="text-muted-foreground hidden sm:inline">-</span>
               <div className="relative w-full">
                 <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input type="date" className="pl-10" />
@@ -26,7 +26,7 @@ export function SetoranFilters() {
           </div>
 
           <div className="grid md:grid-cols-2 grid-cols-1 gap-6 md:gap-12 pt-2 border-t border-dashed">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Filter className="h-4 w-4" />
                 <span className="text-xs font-bold uppercase">Jenis :</span>
@@ -41,7 +41,7 @@ export function SetoranFilters() {
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Filter className="h-4 w-4" />
                 <span className="text-xs font-bold uppercase">Status :</span>

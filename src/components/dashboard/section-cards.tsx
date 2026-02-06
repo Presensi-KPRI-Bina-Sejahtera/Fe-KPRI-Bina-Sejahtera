@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 export function SectionCards() {
   const stats = [
     {
-      label: 'Pemasukan Bulan Ini',
+      label: 'Pemasukan',
       value: 'Rp 2.5jt',
       footerText: '+12% dari bulan kemarin',
       footerTextColor: 'text-emerald-600',
@@ -21,7 +21,7 @@ export function SectionCards() {
       iconBg: 'bg-emerald-50',
     },
     {
-      label: 'Pengeluaran Bulan Ini',
+      label: 'Pengeluaran',
       value: 'Rp 500rb',
       footerText: '-5% dari bulan kemarin',
       footerTextColor: 'text-rose-600',
@@ -31,7 +31,7 @@ export function SectionCards() {
       iconBg: 'bg-rose-50',
     },
     {
-      label: 'Total Setoran Bulan Ini',
+      label: 'Total Setoran',
       value: 'Rp 1.2jt',
       isSpecial: true,
       subValue: '4 Anggota',
@@ -40,8 +40,8 @@ export function SectionCards() {
       iconBg: 'bg-purple-50',
     },
     {
-      label: 'Rata-Rata Jam kerja Bulan ini',
-      value: '9.2 Jam',
+      label: 'Rata-Rata Jam Kerja',
+      value: '9 Jam 10 Menit',
       footerText: '+12% dari bulan kemarin',
       footerTextColor: 'text-emerald-600',
       footerIcon: ArrowUpRight,
@@ -52,17 +52,19 @@ export function SectionCards() {
   ]
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {stats.map((stat, index) => (
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold text-slate-900">Ringkasan Bulan Ini</h2>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {stats.map((stat, index) => (
         <Card key={index} className="shadow-lg border-3 border-slate-200">
           <CardContent className="px-6 flex items-center justify-between">
             <div>
               <div className="flex justify-between items-start">
                 <div className="space-y-1">
-                  <p className="text-md font-medium text-slate-500">
+                  <p className="text-sm 2xl:text-md font-medium text-slate-500">
                     {stat.label}
                   </p>
-                  <h3 className="text-4xl font-bold text-slate-900">
+                  <h3 className="text-xl 2xl:text-4xl font-bold text-slate-900">
                     {stat.value}
                   </h3>
                 </div>
@@ -87,13 +89,14 @@ export function SectionCards() {
               </div>
             </div>
             <div
-              className={`p-4 rounded-full ${stat.iconBg} ${stat.iconColor}`}
+              className={`p-3 2xl:p-4 rounded-full ${stat.iconBg} ${stat.iconColor}`}
             >
-              <stat.icon className="size-8" />
+              <stat.icon className="size-6 2xl:size-8" />
             </div>
           </CardContent>
         </Card>
       ))}
+      </div>
     </div>
   )
 }

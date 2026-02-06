@@ -240,8 +240,9 @@ export function SetoranTable() {
   return (
     <Card className="shadow-lg border-3 border-slate-200 p-0">
       <CardContent className="p-0">
-        <Table>
-          <TableHeader className="bg-slate-50/50">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader className="bg-slate-50/50">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header, index) => {
@@ -274,6 +275,7 @@ export function SetoranTable() {
             ))}
           </TableBody>
         </Table>
+        </div>
 
         <div className="flex items-center justify-center p-4 border-t">
           

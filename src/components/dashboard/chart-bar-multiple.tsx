@@ -43,7 +43,7 @@ export function ChartBarMultiple() {
     <Card className="h-full shadow-lg border-3 border-slate-200 pb-0">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-2xl  font-bold text-slate-900">
-          Pemasukan & Pengeluaran (Minggu Ini)
+          Pemasukan & Pengeluaran Seminggu
         </CardTitle>
         <a href="#" className="text-sm font-medium text-blue-600 hover:underline">
           Lihat Detail
