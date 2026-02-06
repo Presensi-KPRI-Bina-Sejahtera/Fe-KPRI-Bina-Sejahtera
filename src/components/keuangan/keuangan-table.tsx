@@ -2,15 +2,14 @@ import * as React from "react"
 import {
   flexRender,
   getCoreRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
 import { ArrowDownRight, ArrowUpDown, ArrowUpRight, Calendar, ChevronLeft, ChevronRight } from "lucide-react"
-import type {
-  ColumnDef,
-  SortingState} from "@tanstack/react-table";
+import { useNavigate } from "@tanstack/react-router"
+import type { ColumnDef, SortingState } from "@tanstack/react-table"
 
+import type { CashflowRecord } from "@/services/cashflowService"
 import {
   Table,
   TableBody,
@@ -31,29 +30,15 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-type FinanceRecord = {
-  id: string
-  date: string
-  inputBy: {
-    name: string
-    username: string
-    avatar: string
+interface KeuanganTableProps {
+  data: Array<CashflowRecord>
+  pagination: {
+    pageIndex: number
+    pageSize: number
+    pageCount: number
+    total: number
   }
-  type: "Pemasukan" | "Pengeluaran"
-  amount: number
 }
-
-const data: Array<FinanceRecord> = Array.from({ length: 50 }, (_, i) => ({
-  id: `${i + 1}`,
-  date: "2023-10-25",
-  inputBy: {
-    name: i % 2 === 0 ? "Alice Smith" : "Bob Johnson",
-    username: i % 2 === 0 ? "@alicesmith" : "@bobjohnson",
-    avatar: i % 2 === 0 ? "/avatars/alice.jpg" : "/avatars/bob.jpg",
-  },
-  type: i % 3 === 0 ? "Pengeluaran" : "Pemasukan",
-  amount: i % 3 === 0 ? 500000 : 2500000,
-}))
 
 const formatRp = (val: number) => {
   return new Intl.NumberFormat("id-ID", {
@@ -64,15 +49,20 @@ const formatRp = (val: number) => {
   }).format(val)
 }
 
-const columns: Array<ColumnDef<FinanceRecord>> = [
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+
+const columns: Array<ColumnDef<CashflowRecord>> = [
   {
     id: "index",
     header: "No.",
-    cell: ({ row }) => (
-      <span className="text-muted-foreground font-medium">
-        {row.index + 1}.
-      </span>
-    ),
+    cell: ({ row, table }) => {
+       const index = row.index + 1 + (table.getState().pagination.pageIndex * table.getState().pagination.pageSize)
+       return (
+        <span className="text-muted-foreground font-medium">
+          {index}.
+        </span>
+      )
+    },
   },
   {
     accessorKey: "date",
@@ -85,7 +75,7 @@ const columns: Array<ColumnDef<FinanceRecord>> = [
     ),
   },
   {
-    accessorKey: "inputBy",
+    accessorKey: "user.name",
     header: ({ column }) => (
       <Button
         variant="ghost"
@@ -96,26 +86,29 @@ const columns: Array<ColumnDef<FinanceRecord>> = [
         <ArrowUpDown className="ml-2 h-4 w-4 text-muted-foreground" />
       </Button>
     ),
-    cell: ({ row }) => (
-      <div className="flex items-center gap-3">
-        <Avatar className="h-9 w-9 border border-slate-200">
-          <AvatarImage src={row.original.inputBy.avatar} />
-          <AvatarFallback className="bg-slate-100 text-slate-600 font-medium">
-            {row.original.inputBy.name.charAt(0)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col text-left">
-          <span className="font-semibold text-slate-900 text-sm">{row.original.inputBy.name}</span>
-          <span className="text-xs text-muted-foreground">{row.original.inputBy.username}</span>
+    cell: ({ row }) => {
+      const user = row.original.user
+      return (
+        <div className="flex items-center gap-3">
+          <Avatar className="h-9 w-9 border border-slate-200">
+            <AvatarImage src={user.profile_image || ""} />
+            <AvatarFallback className="bg-slate-100 text-slate-600 font-medium">
+              {user.name.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col text-left">
+            <span className="font-semibold text-slate-900 text-sm">{user.name}</span>
+            <span className="text-xs text-muted-foreground">@{user.username}</span>
+          </div>
         </div>
-      </div>
-    ),
+      )
+    },
   },
   {
     accessorKey: "type",
     header: "Tipe",
     cell: ({ row }) => {
-      const isIncome = row.original.type === "Pemasukan"
+      const isIncome = row.original.type === "pemasukan"
       return (
         <Badge 
           variant="outline" 
@@ -126,47 +119,64 @@ const columns: Array<ColumnDef<FinanceRecord>> = [
           }`}
         >
           {isIncome ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
-          {row.original.type}
+          {capitalize(row.original.type)}
         </Badge>
       )
     },
   },
   {
-    accessorKey: "amount",
+    accessorKey: "value",
     header: "Jumlah Uang",
     cell: ({ row }) => {
-      const isIncome = row.original.type === "Pemasukan"
+      const isIncome = row.original.type === "pemasukan"
       return (
         <span className={`font-bold ${isIncome ? "text-emerald-600" : "text-rose-600"}`}>
-          {isIncome ? "+" : "-"}{formatRp(row.original.amount)}
+          {isIncome ? "+" : "-"}{formatRp(row.original.value)}
         </span>
       )
     },
   },
 ]
 
-export function KeuanganTable() {
+export function KeuanganTable({ data, pagination }: KeuanganTableProps) {
+  const navigate = useNavigate()
   const [sorting, setSorting] = React.useState<SortingState>([])
+
+  const handlePageChange = (newPageIndex: number) => {
+    navigate({
+      to: '/keuangan',
+      search: (prev: any) => ({ ...prev, page: newPageIndex + 1 }),
+      replace: true,
+    })
+  }
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    navigate({
+      to: '/keuangan',
+      search: (prev: any) => ({ ...prev, per_page: newPageSize, page: 1 }),
+      replace: true,
+    })
+  }
 
   const table = useReactTable({
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    onSortingChange: setSorting,
+    pageCount: pagination.pageCount,
     state: {
       sorting,
+      pagination: {
+        pageIndex: pagination.pageIndex,
+        pageSize: pagination.pageSize,
+      },
     },
-    initialState: {
-        pagination: {
-            pageSize: 10
-        }
-    }
+    manualPagination: true,
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   })
 
-  const pageIndex = table.getState().pagination.pageIndex
-  const pageCount = table.getPageCount()
+  const pageIndex = pagination.pageIndex
+  const pageCount = pagination.pageCount
   
   const getPageNumbers = () => {
     const pages = []
@@ -216,31 +226,38 @@ export function KeuanganTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id} className="hover:bg-slate-50">
-                {row.getVisibleCells().map((cell, index) => {
-                  let alignClass = "text-center"
-                  if (index === 2) alignClass = "text-left"
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} className="hover:bg-slate-50">
+                  {row.getVisibleCells().map((cell, index) => {
+                    let alignClass = "text-center"
+                    if (index === 2) alignClass = "text-left"
 
-                  return (
-                    <TableCell key={cell.id} className={`py-3 ${alignClass}`}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  )
-                })}
+                    return (
+                      <TableCell key={cell.id} className={`py-3 ${alignClass}`}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  Tidak ada data keuangan.
+                </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
 
         <div className="flex items-center justify-center p-4 border-t">
-          
           <div className="grid md:grid-cols-2 grid-cols-1 gap-6">
             <div className="flex items-center gap-2">
                 <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => table.previousPage()}
+                    onClick={() => handlePageChange(pageIndex - 1)}
                     disabled={!table.getCanPreviousPage()}
                 >
                     <ChevronLeft className="h-4 w-4" />
@@ -255,7 +272,7 @@ export function KeuanganTable() {
                       variant={pageIndex === idx ? "secondary" : "ghost"}
                       size="sm"
                       className={`h-8 w-8 font-bold ${pageIndex === idx ? "text-slate-900" : "text-muted-foreground"}`}
-                      onClick={() => table.setPageIndex(idx)}
+                      onClick={() => handlePageChange(idx)}
                     >
                       {idx + 1}
                     </Button>
@@ -265,7 +282,7 @@ export function KeuanganTable() {
                 <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => table.nextPage()}
+                    onClick={() => handlePageChange(pageIndex + 1)}
                     disabled={!table.getCanNextPage()}
                 >
                     <ChevronRight className="h-4 w-4" />
@@ -273,13 +290,11 @@ export function KeuanganTable() {
             </div>
 
             <Select
-                value={`${table.getState().pagination.pageSize}`}
-                onValueChange={(value) => {
-                  table.setPageSize(Number(value))
-                }}
+                value={`${pagination.pageSize}`}
+                onValueChange={(value) => handlePageSizeChange(Number(value))}
             >
                 <SelectTrigger className="h-8 md:w-27.5 w-auto bg-slate-100 border-none">
-                    <SelectValue placeholder={`${table.getState().pagination.pageSize} / Page`} />
+                    <SelectValue placeholder={`${pagination.pageSize} / Page`} />
                 </SelectTrigger>
                 <SelectContent side="top">
                     {[10, 20, 30, 40, 50].map((pageSize) => (
