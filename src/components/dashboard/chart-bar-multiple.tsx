@@ -2,7 +2,8 @@
 
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
-import type {ChartConfig} from "@/components/ui/chart";
+import type { ChartConfig } from "@/components/ui/chart"
+import type { DashboardStats } from "@/services/dashboardService"
 import {
   Card,
   CardContent,
@@ -11,21 +12,13 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import {
-  
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent
 } from "@/components/ui/chart"
 
-const chartData = [
-  { day: "Senin", pemasukan: 2500000, pengeluaran: 500000 },
-  { day: "Selasa", pemasukan: 3200000, pengeluaran: 800000 },
-  { day: "Rabu", pemasukan: 1800000, pengeluaran: 300000 },
-  { day: "Kamis", pemasukan: 2900000, pengeluaran: 600000 },
-  { day: "Jumat", pemasukan: 4100000, pengeluaran: 1200000 },
-  { day: "Sabtu", pemasukan: 3800000, pengeluaran: 900000 },
-  { day: "Minggu", pemasukan: 5000000, pengeluaran: 1500000 },
-]
+// 🟢 Default days fallback since API labels might be empty
+const DEFAULT_DAYS = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
 
 const chartConfig = {
   pemasukan: {
@@ -38,11 +31,22 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function ChartBarMultiple() {
+// 🟢 Update component to accept props
+export function ChartBarMultiple({ chartData }: { chartData?: DashboardStats['grafik'] }) {
+  
+  // 🟢 Transform API data to Recharts format
+  // If no data is passed yet, default to empty to prevent crashes
+  const processedData = DEFAULT_DAYS.map((day, index) => ({
+    day: day,
+    // Safely access the index, default to 0 if missing
+    pemasukan: chartData?.cashflows.pemasukan[index] ?? 0,
+    pengeluaran: chartData?.cashflows.pengeluaran[index] ?? 0,
+  }))
+
   return (
     <Card className="h-full shadow-lg border-3 border-slate-200 pb-0">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
-        <CardTitle className="text-2xl  font-bold text-slate-900">
+        <CardTitle className="text-2xl font-bold text-slate-900">
           Pemasukan & Pengeluaran (Minggu Ini)
         </CardTitle>
         <a href="#" className="text-sm font-medium text-blue-600 hover:underline">
@@ -51,7 +55,8 @@ export function ChartBarMultiple() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[270px] w-full">
-          <BarChart accessibilityLayer data={chartData} barGap={4}>
+          {/* 🟢 Use processedData here instead of static mock data */}
+          <BarChart accessibilityLayer data={processedData} barGap={4}>
             <CartesianGrid vertical={false} strokeDasharray="3 3" />
             <XAxis
               dataKey="day"
@@ -65,6 +70,7 @@ export function ChartBarMultiple() {
               tickLine={false}
               axisLine={false}
               tickMargin={10}
+              // Formats 1,000,000 to "1jt"
               tickFormatter={(value) => `${value / 1000000}jt`}
               stroke="#94a3b8"
             />

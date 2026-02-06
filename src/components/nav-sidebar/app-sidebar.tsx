@@ -4,6 +4,7 @@ import { LogOut } from 'lucide-react'
 
 import { navItems } from './nav-data'
 import { SearchBar } from './search-bar'
+import { logout } from '@/services/authService'
 import {
   Sidebar,
   SidebarContent,
@@ -116,16 +117,14 @@ export function AppSidebar({
 
           <SidebarMenuItem>
             <SidebarMenuButton
-              asChild
               size="lg"
               className="bg-[#E11D48] hover:bg-[#BE123C] text-white group-data-[collapsible=icon]:!p-2.5"
+              onClick={logout}
             >
-              <Link to="/dashboard">
                 <LogOut />
                 <span className="group-data-[collapsible=icon]:hidden">
                   Log out
                 </span>
-              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

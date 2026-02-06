@@ -10,6 +10,7 @@ import type {
   ColumnDef,
   SortingState} from "@tanstack/react-table";
 
+import type { DashboardStats } from "@/services/dashboardService"
 import {
   Table,
   TableBody,
@@ -23,28 +24,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
-export type Activity = {
-  id: string
-  name: string
-  username: string
-  avatar: string
-  date: string
-  time: string
-  income: number
-  expense: number
-  deposit: number
-}
-
-const data: Array<Activity> = [
-  { id: "1", name: "Alice Smith", username: "@alicesmith", avatar: "/avatars/alice.jpg", date: "2023-10-25", time: "17:05", income: 500000, expense: 100000, deposit: 50000 },
-  { id: "2", name: "Bob Johnson", username: "@bobjohnson", avatar: "/avatars/bob.jpg", date: "2023-10-25", time: "17:05", income: 500000, expense: 100000, deposit: 50000 },
-  { id: "3", name: "Clara Garcia", username: "@claragarcia", avatar: "/avatars/clara.jpg", date: "2023-10-25", time: "17:05", income: 500000, expense: 100000, deposit: 50000 },
-  { id: "4", name: "David Brown", username: "@davidbrown", avatar: "/avatars/david.jpg", date: "2023-10-25", time: "17:05", income: 500000, expense: 100000, deposit: 50000 },
-  { id: "5", name: "Emma Lee", username: "@emmalee", avatar: "/avatars/emma.jpg", date: "2023-10-25", time: "17:05", income: 500000, expense: 100000, deposit: 50000 },
-  { id: "6", name: "Frank Wong", username: "@frankwong", avatar: "/avatars/frank.jpg", date: "2023-10-25", time: "17:05", income: 500000, expense: 100000, deposit: 50000 },
-  { id: "7", name: "Grace Taylor", username: "@gracetaylor", avatar: "/avatars/grace.jpg", date: "2023-10-25", time: "17:05", income: 500000, expense: 100000, deposit: 50000 },
-  { id: "8", name: "Isabella Clark", username: "@isabellaclark", avatar: "/avatars/isabella.jpg", date: "2023-10-25", time: "17:05", income: 500000, expense: 100000, deposit: 50000 },
-]
+type Activity = DashboardStats['pulang_laporan_setoran'][0]
 
 const formatRp = (val: number) => {
   return new Intl.NumberFormat("id-ID", {
@@ -57,7 +37,7 @@ const formatRp = (val: number) => {
 
 export const columns: Array<ColumnDef<Activity>> = [
   {
-    accessorKey: "name",
+    accessorKey: "user.name",
     header: ({ column }) => {
       return (
         <Button
@@ -70,20 +50,23 @@ export const columns: Array<ColumnDef<Activity>> = [
         </Button>
       )
     },
-    cell: ({ row }) => (
-      <div className="flex items-center gap-3">
-        <Avatar className="h-9 w-9 border border-slate-200">
-          <AvatarImage src={row.original.avatar} alt={row.original.name} />
-          <AvatarFallback className="bg-orange-100 text-orange-600 font-medium">
-            {row.original.name.charAt(0)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col text-left">
-          <span className="font-semibold text-slate-900 text-sm">{row.original.name}</span>
-          <span className="text-xs text-muted-foreground">{row.original.username}</span>
+    cell: ({ row }) => {
+      const user = row.original.user
+      return (
+        <div className="flex items-center gap-3">
+          <Avatar className="h-9 w-9 border border-slate-200">
+            <AvatarImage src={user.profile_image || ""} alt={user.name} />
+            <AvatarFallback className="bg-orange-100 text-orange-600 font-medium">
+              {user.name.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col text-left">
+            <span className="font-semibold text-slate-900 text-sm">{user.name}</span>
+            <span className="text-xs text-muted-foreground">@{user.username}</span>
+          </div>
         </div>
-      </div>
-    ),
+      )
+    },
   },
   {
     accessorKey: "date",
@@ -106,20 +89,20 @@ export const columns: Array<ColumnDef<Activity>> = [
     ),
   },
   {
-    accessorKey: "income",
+    accessorKey: "pemasukan",
     header: "Jumlah Pemasukan",
     cell: ({ row }) => (
       <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-100 font-bold px-3 py-1">
-        {formatRp(row.original.income)}
+        {formatRp(row.original.pemasukan)}
       </Badge>
     ),
   },
   {
-    accessorKey: "expense",
+    accessorKey: "pengeluaran",
     header: "Jumlah Pengeluaran",
     cell: ({ row }) => (
       <Badge variant="outline" className="bg-rose-50 text-rose-600 border-rose-100 font-bold px-3 py-1">
-        {formatRp(row.original.expense)}
+        {formatRp(row.original.pengeluaran)}
       </Badge>
     ),
   },
@@ -134,11 +117,11 @@ export const columns: Array<ColumnDef<Activity>> = [
   },
 ]
 
-export function ActivitiesTable() {
+export function ActivitiesTable({ activities }: { activities: Array<Activity> }) {
   const [sorting, setSorting] = React.useState<SortingState>([])
 
   const table = useReactTable({
-    data,
+    data: activities,
     columns,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
@@ -202,7 +185,7 @@ export function ActivitiesTable() {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  Belum ada aktivitas terkini.
                 </TableCell>
               </TableRow>
             )}

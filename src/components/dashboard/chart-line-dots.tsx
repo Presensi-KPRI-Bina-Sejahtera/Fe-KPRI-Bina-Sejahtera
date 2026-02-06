@@ -1,8 +1,7 @@
-"use client"
-
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
 
-import type {ChartConfig} from "@/components/ui/chart";
+import type { ChartConfig } from "@/components/ui/chart"
+import type { DashboardStats } from "@/services/dashboardService"
 import {
   Card,
   CardContent,
@@ -10,21 +9,12 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import {
-  
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent
 } from "@/components/ui/chart"
 
-const chartData = [
-  { day: "Senin", hours: 10 },
-  { day: "Selasa", hours: 9.2 },
-  { day: "Rabu", hours: 9.8 },
-  { day: "Kamis", hours: 9.5 },
-  { day: "Jumat", hours: 8.5 },
-  { day: "Sabtu", hours: 7 },
-  { day: "Minggu", hours: 0 },
-]
+const DEFAULT_DAYS = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
 
 const chartConfig = {
   hours: {
@@ -33,7 +23,13 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function ChartLineDots() {
+export function ChartLineDots({ chartData }: { chartData?: DashboardStats['grafik'] }) {
+
+  const processedData = DEFAULT_DAYS.map((day, index) => ({
+    day: day,
+    hours: chartData?.work_hours.data[index] ?? 0,
+  }))
+
   return (
     <Card className="h-full shadow-lg border-3 border-slate-200">
       <CardHeader className="flex flex-row items-center justify-between space-y-0">
@@ -45,7 +41,7 @@ export function ChartLineDots() {
         <ChartContainer config={chartConfig} className="h-full w-full">
           <LineChart
             accessibilityLayer
-            data={chartData}
+            data={processedData}
             margin={{
               left: 0,
               right: 12,

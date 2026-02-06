@@ -1,8 +1,10 @@
+import { useEffect, useState } from 'react'
 import {
-  Link,
   Outlet,
   createFileRoute,
+  redirect,
   useLocation,
+  useRouter,
 } from '@tanstack/react-router'
 import { AppSidebar } from '@/components/nav-sidebar/app-sidebar'
 import {
@@ -14,15 +16,41 @@ import { navItems } from '@/components/nav-sidebar/nav-data'
 import { SearchBar } from '@/components/nav-sidebar/search-bar'
 import { UserNav } from '@/components/nav-sidebar/user-nav'
 import Notifications from '@/components/nav-sidebar/notifications'
+import { isAuthenticated } from '@/services/authService'
 
 export const Route = createFileRoute('/_auth')({
+  beforeLoad: ({ location }) => {
+    if (!isAuthenticated()) {
+      throw redirect({
+        to: '/login',
+        search: {
+          redirect: location.href,
+        },
+      })
+    }
+  },
   component: AuthLayout,
 })
 
 function AuthLayout() {
+  const router = useRouter()
   const pathname = useLocation({
     select: (location) => location.pathname,
   })
+
+  const [isAuthorized, setIsAuthorized] = useState(false)
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      setIsAuthorized(true)
+    } else {
+      router.navigate({ to: '/login', replace: true })
+    }
+  }, [router])
+
+  if (!isAuthorized) {
+    return null
+  }
 
   return (
     <SidebarProvider
