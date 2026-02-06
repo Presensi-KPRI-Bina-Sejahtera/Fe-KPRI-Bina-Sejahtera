@@ -42,7 +42,7 @@ type AttendanceRecord = {
   totalHours: string
 }
 
-const data: Array<AttendanceRecord> = Array.from({ length: 50 }, (_, i) => ({
+const data: Array<AttendanceRecord> = Array.from({ length: 150 }, (_, i) => ({
   id: `${i + 1}`,
   name: i % 2 === 0 ? "Alice Smith" : "Bob Johnson",
   username: i % 2 === 0 ? "@alicesmith" : "@bobjohnson",
@@ -220,7 +220,7 @@ export function KehadiranTable() {
           </TableBody>
         </Table>
         <div className="flex items-center justify-center p-4 border-t">
-          <div className="flex items-center gap-6">
+          <div className="grid md:grid-cols-2 grid-cols-1 gap-6">
             <div className="flex items-center gap-2">
                 <Button
                     variant="ghost"
@@ -263,7 +263,7 @@ export function KehadiranTable() {
                   table.setPageSize(Number(value))
                 }}
             >
-                <SelectTrigger className="h-8 w-[110px] bg-slate-100 border-none">
+                <SelectTrigger className="h-8 md:w-27.5 w-auto bg-slate-100 border-none">
                     <SelectValue placeholder={table.getState().pagination.pageSize} />
                 </SelectTrigger>
                 <SelectContent side="top">
