@@ -1,8 +1,9 @@
-import { useState } from "react"
-import { FileSpreadsheet, Loader2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { toast } from "sonner"
-import { exportDepositExcel, DepositParams } from "@/services/depositService"
+import { useState } from 'react'
+import { FileSpreadsheet, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
+import type { DepositParams} from '@/services/depositService';
+import { Button } from '@/components/ui/button'
+import { exportDepositExcel } from '@/services/depositService'
 
 interface SetoranHeaderProps {
   currentFilters: DepositParams
@@ -15,24 +16,24 @@ export function SetoranHeader({ currentFilters }: SetoranHeaderProps) {
     setIsExporting(true)
     try {
       const blob = await exportDepositExcel(currentFilters)
-      
+
       const url = window.URL.createObjectURL(new Blob([blob]))
       const link = document.createElement('a')
       link.href = url
-      
+
       const filename = `Laporan_Setoran_${new Date().toISOString().split('T')[0]}.xlsx`
       link.setAttribute('download', filename)
-      
+
       document.body.appendChild(link)
       link.click()
-      
+
       link.parentNode?.removeChild(link)
       window.URL.revokeObjectURL(url)
-      
-      toast.success("Export Excel berhasil diunduh")
+
+      toast.success('Export Excel berhasil diunduh')
     } catch (error) {
-      console.error("Export failed", error)
-      toast.error("Gagal mengunduh file Excel")
+      console.error('Export failed', error)
+      toast.error('Gagal mengunduh file Excel')
     } finally {
       setIsExporting(false)
     }
@@ -46,7 +47,7 @@ export function SetoranHeader({ currentFilters }: SetoranHeaderProps) {
           Kelola simpanan dan angsuran anggota koperasi
         </p>
       </div>
-      <Button 
+      <Button
         className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2 h-12"
         onClick={handleExport}
         disabled={isExporting}
@@ -56,7 +57,7 @@ export function SetoranHeader({ currentFilters }: SetoranHeaderProps) {
         ) : (
           <FileSpreadsheet className="h-4 w-4" />
         )}
-        {isExporting ? "Mengunduh..." : "Export Excel"}
+        {isExporting ? 'Mengunduh...' : 'Export Excel'}
       </Button>
     </div>
   )

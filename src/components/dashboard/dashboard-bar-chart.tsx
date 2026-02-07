@@ -1,38 +1,52 @@
-"use client"
-
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
-
-import type { ChartConfig } from "@/components/ui/chart"
-import type { DashboardStats } from "@/services/dashboardService"
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
+import { Link } from '@tanstack/react-router'
+import type { ChartConfig } from '@/components/ui/chart'
+import type { DashboardStats } from '@/services/dashboardService'
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from '@/components/ui/card'
 import {
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent
-} from "@/components/ui/chart"
+  ChartTooltipContent,
+} from '@/components/ui/chart'
 
-const DEFAULT_DAYS = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
+const DEFAULT_DAYS = [
+  'Minggu',
+  'Senin',
+  'Selasa',
+  'Rabu',
+  'Kamis',
+  'Jumat',
+  'Sabtu',
+]
 
 const chartConfig = {
   pemasukan: {
-    label: "Penghasilan",
-    color: "#22c55e",
+    label: 'Penghasilan',
+    color: '#22c55e',
   },
   pengeluaran: {
-    label: "Pengeluaran",
-    color: "#ef4444",
+    label: 'Pengeluaran',
+    color: '#ef4444',
   },
 } satisfies ChartConfig
 
-export function ChartBarMultiple({ chartData }: { chartData?: DashboardStats['grafik'] }) {
-  
-  const processedData = DEFAULT_DAYS.map((day, index) => ({
+export function DashboardBarChart({
+  chartData,
+}: {
+  chartData?: DashboardStats['grafik']
+}) {
+  const sourceLabels =
+    chartData?.labels && chartData.labels.length > 0
+      ? chartData.labels
+      : DEFAULT_DAYS
+
+  const processedData = sourceLabels.map((day, index) => ({
     day: day,
     pemasukan: chartData?.cashflows.pemasukan[index] ?? 0,
     pengeluaran: chartData?.cashflows.pengeluaran[index] ?? 0,
@@ -44,13 +58,19 @@ export function ChartBarMultiple({ chartData }: { chartData?: DashboardStats['gr
         <CardTitle className="text-2xl  font-bold text-slate-900">
           Pemasukan & Pengeluaran Seminggu
         </CardTitle>
-        <a href="#" className="text-sm font-medium text-blue-600 hover:underline">
+        <Link
+          to="/keuangan"
+          search={{
+            page: 1,
+            per_page: 10,
+          }}
+          className="text-sm font-medium text-blue-600 hover:underline"
+        >
           Lihat Detail
-        </a>
+        </Link>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-[270px] w-full">
-          {/* 🟢 Use processedData here instead of static mock data */}
           <BarChart accessibilityLayer data={processedData} barGap={4}>
             <CartesianGrid vertical={false} strokeDasharray="3 3" />
             <XAxis
@@ -61,11 +81,10 @@ export function ChartBarMultiple({ chartData }: { chartData?: DashboardStats['gr
               tickFormatter={(value) => value}
               stroke="#94a3b8"
             />
-             <YAxis 
+            <YAxis
               tickLine={false}
               axisLine={false}
               tickMargin={10}
-              // Formats 1,000,000 to "1jt"
               tickFormatter={(value) => `${value / 1000000}jt`}
               stroke="#94a3b8"
             />
@@ -73,16 +92,16 @@ export function ChartBarMultiple({ chartData }: { chartData?: DashboardStats['gr
               cursor={{ fill: 'transparent' }}
               content={<ChartTooltipContent indicator="dashed" />}
             />
-            <Bar 
-              dataKey="pemasukan" 
-              fill="var(--color-pemasukan)" 
-              radius={[4, 4, 0, 0]} 
+            <Bar
+              dataKey="pemasukan"
+              fill="var(--color-pemasukan)"
+              radius={[4, 4, 0, 0]}
               barSize={24}
             />
-            <Bar 
-              dataKey="pengeluaran" 
-              fill="var(--color-pengeluaran)" 
-              radius={[4, 4, 0, 0]} 
+            <Bar
+              dataKey="pengeluaran"
+              fill="var(--color-pengeluaran)"
+              radius={[4, 4, 0, 0]}
               barSize={24}
             />
           </BarChart>
@@ -95,7 +114,9 @@ export function ChartBarMultiple({ chartData }: { chartData?: DashboardStats['gr
         </div>
         <div className="flex items-center gap-2">
           <div className="h-3 w-3 bg-green-500" />
-          <span className="text-sm font-medium text-green-500">Penghasilan</span>
+          <span className="text-sm font-medium text-green-500">
+            Penghasilan
+          </span>
         </div>
       </CardFooter>
     </Card>

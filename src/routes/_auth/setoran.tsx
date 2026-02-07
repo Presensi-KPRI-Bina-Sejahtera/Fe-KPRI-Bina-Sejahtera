@@ -1,12 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useQuery } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
 import { getDepositList } from '@/services/depositService'
 import { SetoranHeader } from '@/components/setoran/setoran-header'
 import { SetoranFilters } from '@/components/setoran/setoran-filters'
 import { SetoranSearch } from '@/components/setoran/setoran-search'
 import { SetoranTable } from '@/components/setoran/setoran-table'
+import LoadingPage from '@/components/loading-page'
+import ErrorPage from '@/components/error-page'
 
 const depositSearchSchema = z.object({
   page: z.number().catch(1),
@@ -33,19 +34,11 @@ function SetoranPage() {
   })
 
   if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-      </div>
-    )
+    return <LoadingPage />
   }
 
   if (error) {
-    return (
-      <div className="p-8 text-center text-red-500">
-        Terjadi kesalahan saat memuat data setoran.
-      </div>
-    )
+    return <ErrorPage page="setoran" />
   }
 
   return (

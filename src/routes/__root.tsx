@@ -10,13 +10,11 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 import appCss from '../styles.css?url'
 import type { QueryClient } from '@tanstack/react-query'
+import { env } from '@/env'
 
 interface MyRouterContext {
   queryClient: QueryClient
 }
-
-const GOOGLE_CLIENT_ID =
-  '364805871560-5sbnmaojh82j4c4hn29a64nni1f7p8vs.apps.googleusercontent.com'
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
@@ -29,7 +27,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'KPRI Bina Sejahtera',
       },
     ],
     links: [
@@ -37,16 +35,21 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         rel: 'stylesheet',
         href: appCss,
       },
+      {
+        rel: 'icon',
+        href: '/Logo.ico',
+      }
     ],
   }),
   notFoundComponent: () => {
+    // Komponen 404 Page Not Found
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center gap-4">
         <h1 className="text-4xl font-bold">404</h1>
         <p className="text-muted-foreground">
           Halaman yang Anda cari tidak ditemukan.
         </p>
-        <Link to="/" className="text-blue-600 hover:underline">
+        <Link to="/dashboard" className="text-blue-600 hover:underline">
           Kembali ke Dashboard
         </Link>
       </div>
@@ -62,9 +65,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+
+        {/* Tempat masuk utama aplikasi */}
+        <GoogleOAuthProvider clientId={env.VITE_GOOGLE_CLIENT_ID}>
           {children}
         </GoogleOAuthProvider>
+
+        {/* Devtools akan dihilangkan otomatis di production */}
         <TanStackDevtools
           config={{
             position: 'bottom-right',

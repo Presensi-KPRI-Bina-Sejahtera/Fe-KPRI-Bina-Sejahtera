@@ -1,4 +1,4 @@
-import { TokoAddDialog } from "./toko-add-dialog"
+import { TokoAddDialog } from './toko-add-dialog'
 
 export function TokoHeader() {
   return (

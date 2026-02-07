@@ -1,6 +1,6 @@
-import { AlertTriangle, Loader2 } from "lucide-react"
-import type { TokoRecord } from "@/services/tokoService"
-import { Button } from "@/components/ui/button"
+import { AlertTriangle, Loader2 } from 'lucide-react'
+import type { TokoRecord } from '@/services/tokoService'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from '@/components/ui/dialog'
 
 interface TokoDeleteDialogProps {
   open: boolean
@@ -18,14 +18,13 @@ interface TokoDeleteDialogProps {
   isDeleting: boolean
 }
 
-export function TokoDeleteDialog({ 
-  open, 
-  onOpenChange, 
-  toko, 
-  onConfirm, 
-  isDeleting 
+export function TokoDeleteDialog({
+  open,
+  onOpenChange,
+  toko,
+  onConfirm,
+  isDeleting,
 }: TokoDeleteDialogProps) {
-  
   const handleConfirm = (e: React.MouseEvent) => {
     e.preventDefault()
     if (toko) {
@@ -42,23 +41,24 @@ export function TokoDeleteDialog({
             <DialogTitle className="text-xl font-bold">Hapus Toko?</DialogTitle>
           </div>
           <DialogDescription className="text-slate-600">
-            Apakah Anda yakin ingin menghapus <b>{toko?.name}</b>? 
+            Apakah Anda yakin ingin menghapus <b>{toko?.name}</b>?
             <br />
-            Data yang dihapus tidak dapat dikembalikan dan presensi di lokasi ini tidak akan valid lagi.
+            Data yang dihapus tidak dapat dikembalikan dan presensi di lokasi
+            ini tidak akan valid lagi.
           </DialogDescription>
         </DialogHeader>
-        
+
         <DialogFooter className="gap-2 mt-4 sm:gap-0">
-          <Button 
-            variant="outline" 
-            className="w-full sm:w-auto border-slate-200 hover:bg-slate-100 hover:text-slate-900" 
+          <Button
+            variant="outline"
+            className="w-full sm:w-auto border-slate-200 hover:bg-slate-100 hover:text-slate-900"
             onClick={() => onOpenChange(false)}
             disabled={isDeleting}
           >
             Batal
           </Button>
-          <Button 
-            className="w-full sm:w-auto bg-rose-600 text-white hover:bg-rose-700" 
+          <Button
+            className="w-full sm:w-auto bg-rose-600 text-white hover:bg-rose-700"
             onClick={handleConfirm}
             disabled={isDeleting}
           >
@@ -68,7 +68,7 @@ export function TokoDeleteDialog({
                 Menghapus...
               </>
             ) : (
-              "Ya, Hapus"
+              'Ya, Hapus'
             )}
           </Button>
         </DialogFooter>

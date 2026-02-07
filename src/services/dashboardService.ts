@@ -11,7 +11,7 @@ export type DashboardStats = {
     }
   }
   grafik: {
-    labels: Array<string> // e.g. ["Senin", "Selasa", ...]
+    labels: Array<string>
     work_hours: { data: Array<number> }
     cashflows: { 
       pemasukan: Array<number>

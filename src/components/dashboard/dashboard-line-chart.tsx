@@ -1,5 +1,4 @@
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
-
 import type { ChartConfig } from "@/components/ui/chart"
 import type { DashboardStats } from "@/services/dashboardService"
 import {
@@ -14,7 +13,7 @@ import {
   ChartTooltipContent
 } from "@/components/ui/chart"
 
-const DEFAULT_DAYS = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
+const DEFAULT_DAYS = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"]
 
 const chartConfig = {
   hours: {
@@ -23,11 +22,15 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function ChartLineDots({ chartData }: { chartData?: DashboardStats['grafik'] }) {
+export function DashboardLineChart({ chartData }: { chartData?: DashboardStats['grafik'] }) {
 
-  const processedData = DEFAULT_DAYS.map((day, index) => ({
+  const sourceLabels = chartData?.labels && chartData.labels.length > 0 
+    ? chartData.labels 
+    : DEFAULT_DAYS
+
+  const processedData = sourceLabels.map((day, index) => ({
     day: day,
-    hours: chartData?.work_hours.data[index] ?? 0,
+    hours: chartData?.work_hours?.data?.[index] ?? 0,
   }))
 
   return (

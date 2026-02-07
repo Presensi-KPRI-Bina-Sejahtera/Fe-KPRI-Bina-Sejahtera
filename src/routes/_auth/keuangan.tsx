@@ -1,13 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useQuery } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
-
 import { getCashflowList } from '@/services/cashflowService'
 import { KeuanganHeader } from '@/components/keuangan/keuangan-header'
 import { KeuanganStats } from '@/components/keuangan/keuangan-stats'
 import { KeuanganFilters } from '@/components/keuangan/keuangan-filters'
 import { KeuanganTable } from '@/components/keuangan/keuangan-table'
+import LoadingPage from '@/components/loading-page'
+import ErrorPage from '@/components/error-page'
 
 const cashflowSearchSchema = z.object({
   page: z.number().catch(1),
@@ -33,19 +33,11 @@ function KeuanganPage() {
   })
 
   if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-      </div>
-    )
+    return <LoadingPage />
   }
 
   if (error) {
-    return (
-      <div className="p-8 text-center text-red-500">
-        Terjadi kesalahan saat memuat data keuangan.
-      </div>
-    )
+    return <ErrorPage page="keuangan" />
   }
 
   return (

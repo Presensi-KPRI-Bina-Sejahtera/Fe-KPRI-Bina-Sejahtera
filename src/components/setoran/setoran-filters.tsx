@@ -1,20 +1,23 @@
-import { useEffect, useState } from "react"
-import { useNavigate } from "@tanstack/react-router"
-import { Calendar, Filter } from "lucide-react"
-import type { DepositParams, DepositResponse } from "@/services/depositService"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
+import { useEffect, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
+import { Calendar, Filter } from 'lucide-react'
+import type { DepositParams, DepositResponse } from '@/services/depositService'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 
 interface SetoranFiltersProps {
   currentFilters: DepositParams
   summary?: DepositResponse['summary']
 }
 
-export function SetoranFilters({ currentFilters, summary }: SetoranFiltersProps) {
+export function SetoranFilters({
+  currentFilters,
+  summary,
+}: SetoranFiltersProps) {
   const navigate = useNavigate()
-  
+
   const getToday = () => {
     const date = new Date()
     const year = date.getFullYear()
@@ -58,9 +61,9 @@ export function SetoranFilters({ currentFilters, summary }: SetoranFiltersProps)
   }, [currentFilters, navigate])
 
   const formatRp = (val: number) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(val)
@@ -72,10 +75,10 @@ export function SetoranFilters({ currentFilters, summary }: SetoranFiltersProps)
 
     navigate({
       to: '/setoran',
-      search: { 
-        ...newFilters, 
-        page: 1, 
-        per_page: newFilters.per_page ?? 10
+      search: {
+        ...newFilters,
+        page: 1,
+        per_page: newFilters.per_page ?? 10,
       },
       replace: true,
     })
@@ -111,15 +114,16 @@ export function SetoranFilters({ currentFilters, summary }: SetoranFiltersProps)
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <Card className="lg:col-span-2 shadow-lg border-3 border-slate-200">
         <CardContent className="px-6 flex flex-col justify-between h-full gap-6">
-          
           <div className="space-y-2">
-            <Label className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Rentang Tanggal</Label>
+            <Label className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+              Rentang Tanggal
+            </Label>
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="relative w-full">
                 <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  type="date" 
-                  className="pl-10" 
+                <Input
+                  type="date"
+                  className="pl-10"
                   value={filters.start_date || ''}
                   onChange={(e) => applyFilter('start_date', e.target.value)}
                 />
@@ -127,9 +131,9 @@ export function SetoranFilters({ currentFilters, summary }: SetoranFiltersProps)
               <span className="text-muted-foreground hidden sm:inline">-</span>
               <div className="relative w-full">
                 <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  type="date" 
-                  className="pl-10" 
+                <Input
+                  type="date"
+                  className="pl-10"
                   value={filters.end_date || ''}
                   onChange={(e) => applyFilter('end_date', e.target.value)}
                 />
@@ -144,20 +148,24 @@ export function SetoranFilters({ currentFilters, summary }: SetoranFiltersProps)
                 <span className="text-xs font-bold uppercase">Jenis :</span>
               </div>
               <div className="flex items-center gap-2">
-                <Checkbox 
-                  id="simpanan" 
+                <Checkbox
+                  id="simpanan"
                   checked={isSimpananChecked}
                   onCheckedChange={() => handleTypeToggle('simpanan')}
                 />
-                <Label htmlFor="simpanan" className="cursor-pointer font-bold">Simpanan</Label>
+                <Label htmlFor="simpanan" className="cursor-pointer font-bold">
+                  Simpanan
+                </Label>
               </div>
               <div className="flex items-center gap-2">
-                <Checkbox 
-                  id="angsuran" 
+                <Checkbox
+                  id="angsuran"
                   checked={isAngsuranChecked}
                   onCheckedChange={() => handleTypeToggle('angsuran')}
                 />
-                <Label htmlFor="angsuran" className="cursor-pointer font-bold">Angsuran</Label>
+                <Label htmlFor="angsuran" className="cursor-pointer font-bold">
+                  Angsuran
+                </Label>
               </div>
             </div>
 
@@ -167,20 +175,24 @@ export function SetoranFilters({ currentFilters, summary }: SetoranFiltersProps)
                 <span className="text-xs font-bold uppercase">Status :</span>
               </div>
               <div className="flex items-center gap-2">
-                <Checkbox 
-                  id="verified" 
+                <Checkbox
+                  id="verified"
                   checked={isVerifiedChecked}
                   onCheckedChange={() => handleStatusToggle('verified')}
                 />
-                <Label htmlFor="verified" className="cursor-pointer font-bold">Terverifikasi</Label>
+                <Label htmlFor="verified" className="cursor-pointer font-bold">
+                  Terverifikasi
+                </Label>
               </div>
               <div className="flex items-center gap-2">
-                <Checkbox 
-                  id="pending" 
+                <Checkbox
+                  id="pending"
                   checked={isPendingChecked}
                   onCheckedChange={() => handleStatusToggle('pending')}
                 />
-                <Label htmlFor="pending" className="cursor-pointer font-bold">Belum</Label>
+                <Label htmlFor="pending" className="cursor-pointer font-bold">
+                  Belum
+                </Label>
               </div>
             </div>
           </div>
@@ -192,14 +204,14 @@ export function SetoranFilters({ currentFilters, summary }: SetoranFiltersProps)
           <h3 className="text-slate-300 font-medium border-b border-slate-700 pb-2">
             Total Berdasarkan Filter
           </h3>
-          
+
           <div className="flex justify-between items-center">
             <span className="text-slate-400 text-sm">Simpanan</span>
             <span className="text-emerald-400 font-bold text-lg">
               {formatRp(summary?.simpanan ?? 0)}
             </span>
           </div>
-          
+
           <div className="flex justify-between items-center">
             <span className="text-slate-400 text-sm">Angsuran</span>
             <span className="text-blue-400 font-bold text-lg">

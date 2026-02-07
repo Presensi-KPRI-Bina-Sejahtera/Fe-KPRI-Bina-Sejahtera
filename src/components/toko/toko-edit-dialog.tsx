@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { Loader2, MapPin } from "lucide-react"
-import { toast } from "sonner"
-import { MapPicker } from "./map-picker"
-import type { TokoRecord} from "@/services/tokoService";
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Loader2, MapPin } from 'lucide-react'
+import { toast } from 'sonner'
+import { MapPicker } from './map-picker'
+import type { TokoRecord } from '@/services/tokoService'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -12,10 +12,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { getAddressFromCoordinates, updateToko } from "@/services/tokoService"
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { getAddressFromCoordinates, updateToko } from '@/services/tokoService'
 
 interface TokoEditDialogProps {
   open: boolean
@@ -23,12 +23,16 @@ interface TokoEditDialogProps {
   toko: TokoRecord | null
 }
 
-export function TokoEditDialog({ open, onOpenChange, toko }: TokoEditDialogProps) {
+export function TokoEditDialog({
+  open,
+  onOpenChange,
+  toko,
+}: TokoEditDialogProps) {
   const queryClient = useQueryClient()
-  
-  const [coords, setCoords] = useState({ lat: -6.200000, lng: 106.816666 })
-  const [name, setName] = useState("")
-  const [address, setAddress] = useState("")
+
+  const [coords, setCoords] = useState({ lat: -6.2, lng: 106.816666 })
+  const [name, setName] = useState('')
+  const [address, setAddress] = useState('')
   const [maxDistance, setMaxDistance] = useState(50)
   const [isLoadingAddress, setIsLoadingAddress] = useState(false)
 
@@ -39,7 +43,7 @@ export function TokoEditDialog({ open, onOpenChange, toko }: TokoEditDialogProps
       setMaxDistance(toko.max_distance)
       setCoords({
         lat: parseFloat(toko.latitude),
-        lng: parseFloat(toko.longitude)
+        lng: parseFloat(toko.longitude),
       })
     }
   }, [toko])
@@ -47,14 +51,14 @@ export function TokoEditDialog({ open, onOpenChange, toko }: TokoEditDialogProps
   const mutation = useMutation({
     mutationFn: (data: any) => updateToko(toko!.id, data),
     onSuccess: () => {
-      toast.success("Toko berhasil diperbarui")
-      queryClient.invalidateQueries({ queryKey: ["toko"] })
+      toast.success('Toko berhasil diperbarui')
+      queryClient.invalidateQueries({ queryKey: ['toko'] })
       onOpenChange(false)
     },
     onError: (error: any) => {
       console.error(error)
-      toast.error("Gagal memperbarui toko")
-    }
+      toast.error('Gagal memperbarui toko')
+    },
   })
 
   const handleLocationSelect = async (lat: number, lng: number) => {
@@ -66,7 +70,7 @@ export function TokoEditDialog({ open, onOpenChange, toko }: TokoEditDialogProps
         setAddress(fetchedAddress)
       }
     } catch (error) {
-      console.error("Failed to get address", error)
+      console.error('Failed to get address', error)
     } finally {
       setIsLoadingAddress(false)
     }
@@ -75,7 +79,7 @@ export function TokoEditDialog({ open, onOpenChange, toko }: TokoEditDialogProps
   const handleSubmit = () => {
     if (!toko) return
     if (!name || !address) {
-      toast.error("Nama toko dan alamat harus diisi")
+      toast.error('Nama toko dan alamat harus diisi')
       return
     }
 
@@ -84,7 +88,7 @@ export function TokoEditDialog({ open, onOpenChange, toko }: TokoEditDialogProps
       address,
       latitude: coords.lat,
       longitude: coords.lng,
-      max_distance: maxDistance
+      max_distance: maxDistance,
     })
   }
 
@@ -97,15 +101,17 @@ export function TokoEditDialog({ open, onOpenChange, toko }: TokoEditDialogProps
             Ubah detail lokasi toko
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="grid gap-6 py-4">
           <div className="space-y-2">
-            <Label htmlFor="edit-name" className="font-bold text-slate-700">Nama Toko</Label>
-            <Input 
-              id="edit-name" 
+            <Label htmlFor="edit-name" className="font-bold text-slate-700">
+              Nama Toko
+            </Label>
+            <Input
+              id="edit-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="bg-slate-50" 
+              className="bg-slate-50"
             />
           </div>
 
@@ -114,28 +120,28 @@ export function TokoEditDialog({ open, onOpenChange, toko }: TokoEditDialogProps
               <MapPin className="size-5" />
               <span className="text-slate-900">Lokasi Toko</span>
             </div>
-            
-            <MapPicker 
-              lat={coords.lat} 
-              lng={coords.lng} 
-              onLocationSelect={handleLocationSelect} 
+
+            <MapPicker
+              lat={coords.lat}
+              lng={coords.lng}
+              onLocationSelect={handleLocationSelect}
             />
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label className="text-slate-600">Latitude</Label>
-                <Input 
-                  value={coords.lat} 
-                  readOnly 
-                  className="bg-white font-mono text-xs text-slate-500" 
+                <Input
+                  value={coords.lat}
+                  readOnly
+                  className="bg-white font-mono text-xs text-slate-500"
                 />
               </div>
               <div className="space-y-2">
                 <Label className="text-slate-600">Longitude</Label>
-                <Input 
-                  value={coords.lng} 
-                  readOnly 
-                  className="bg-white font-mono text-xs text-slate-500" 
+                <Input
+                  value={coords.lng}
+                  readOnly
+                  className="bg-white font-mono text-xs text-slate-500"
                 />
               </div>
             </div>
@@ -143,43 +149,51 @@ export function TokoEditDialog({ open, onOpenChange, toko }: TokoEditDialogProps
             <div className="space-y-2">
               <div className="flex justify-between">
                 <Label className="text-slate-600">Alamat</Label>
-                {isLoadingAddress && <span className="text-xs text-blue-500 animate-pulse">Mengambil alamat...</span>}
+                {isLoadingAddress && (
+                  <span className="text-xs text-blue-500 animate-pulse">
+                    Mengambil alamat...
+                  </span>
+                )}
               </div>
-              <Input 
+              <Input
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                className="bg-white" 
+                className="bg-white"
               />
             </div>
 
             <div className="space-y-2">
-              <Label className="text-slate-600">Jarak maksimal (m) untuk presensi</Label>
-              <Input 
-                type="number" 
+              <Label className="text-slate-600">
+                Jarak maksimal (m) untuk presensi
+              </Label>
+              <Input
+                type="number"
                 value={maxDistance}
                 onChange={(e) => setMaxDistance(Number(e.target.value))}
-                className="bg-white" 
+                className="bg-white"
               />
             </div>
           </div>
         </div>
 
         <DialogFooter>
-          <Button 
-            variant="destructive" 
-            className="md:w-[50%] w-full h-12" 
+          <Button
+            variant="destructive"
+            className="md:w-[50%] w-full h-12"
             onClick={() => onOpenChange(false)}
             disabled={mutation.isPending}
           >
             Batal
           </Button>
-          <Button 
+          <Button
             className="md:w-[50%] w-full bg-slate-900 text-white hover:bg-slate-800 h-12"
             onClick={handleSubmit}
             disabled={mutation.isPending}
           >
-            {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {mutation.isPending ? "Menyimpan..." : "Simpan Perubahan"}
+            {mutation.isPending && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            {mutation.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
           </Button>
         </DialogFooter>
       </DialogContent>

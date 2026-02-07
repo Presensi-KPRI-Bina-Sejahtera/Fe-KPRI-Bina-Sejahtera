@@ -1,11 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useQuery } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
 import { getTokoList } from '@/services/tokoService'
 import { TokoHeader } from '@/components/toko/toko-header'
 import { TokoSearch } from '@/components/toko/toko-search'
 import { TokoTable } from '@/components/toko/toko-table'
+import LoadingPage from '@/components/loading-page'
+import ErrorPage from '@/components/error-page'
 
 const tokoSearchSchema = z.object({
   page: z.number().catch(1),
@@ -28,19 +29,11 @@ function TokoPage() {
   })
 
   if (isLoading) {
-    return (
-      <div className="flex h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-      </div>
-    )
+    return <LoadingPage />
   }
 
   if (error) {
-    return (
-      <div className="p-8 text-center text-red-500 font-medium">
-        Gagal memuat data toko. Silakan coba lagi nanti.
-      </div>
-    )
+    return <ErrorPage page="toko" />
   }
 
   return (

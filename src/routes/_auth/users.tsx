@@ -1,11 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useQuery } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
 import { getUserList } from '@/services/userService'
 import { UsersHeader } from '@/components/users/users-header'
 import { UsersFilters } from '@/components/users/users-filters'
 import { UsersTable } from '@/components/users/users-table'
+import LoadingPage from '@/components/loading-page'
+import ErrorPage from '@/components/error-page'
 
 const usersSearchSchema = z.object({
   page: z.number().catch(1),
@@ -29,19 +30,11 @@ function UsersPage() {
   })
 
   if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
-      </div>
-    )
+    return <LoadingPage />
   }
 
   if (error) {
-    return (
-      <div className="p-8 text-center text-red-500">
-        Terjadi kesalahan saat memuat data user.
-      </div>
-    )
+    return <ErrorPage page="users" />
   }
 
   return (

@@ -117,7 +117,7 @@ export const columns: Array<ColumnDef<Activity>> = [
   },
 ]
 
-export function ActivitiesTable({ activities }: { activities: Array<Activity> }) {
+export function DashboardTable({ activities }: { activities: Array<Activity> }) {
   const [sorting, setSorting] = React.useState<SortingState>([])
 
   const table = useReactTable({

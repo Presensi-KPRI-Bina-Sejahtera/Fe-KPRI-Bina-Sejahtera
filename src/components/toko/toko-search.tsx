@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react"
-import { useNavigate } from "@tanstack/react-router"
-import { Search, X } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { useEffect, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
+import { Search, X } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 
 export function TokoSearch({ currentSearch }: { currentSearch?: string }) {
   const navigate = useNavigate()
-  const [searchTerm, setSearchTerm] = useState(currentSearch || "")
+  const [searchTerm, setSearchTerm] = useState(currentSearch || '')
 
   useEffect(() => {
-    setSearchTerm(currentSearch || "")
+    setSearchTerm(currentSearch || '')
   }, [currentSearch])
 
   const handleSearch = (term: string) => {
@@ -26,14 +26,14 @@ export function TokoSearch({ currentSearch }: { currentSearch?: string }) {
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleSearch(searchTerm)
     }
   }
 
   const clearSearch = () => {
-    setSearchTerm("")
-    handleSearch("")
+    setSearchTerm('')
+    handleSearch('')
   }
 
   return (
@@ -41,9 +41,9 @@ export function TokoSearch({ currentSearch }: { currentSearch?: string }) {
       <CardContent className="p-0">
         <div className="relative">
           <Search className="absolute left-4 top-3.5 h-4 w-4 text-muted-foreground" />
-          <Input 
-            placeholder="Cari nama toko..." 
-            className="pl-10 pr-10 h-11 border-none shadow-none focus-visible:ring-0" 
+          <Input
+            placeholder="Cari nama toko..."
+            className="pl-10 pr-10 h-11 border-none shadow-none focus-visible:ring-0"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onBlur={() => handleSearch(searchTerm)}
