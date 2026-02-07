@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "@tanstack/react-router"
 import { Search, X } from "lucide-react"
 import { Input } from "@/components/ui/input"

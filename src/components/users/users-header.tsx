@@ -1,19 +1,16 @@
-import { Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { UserAddDialog } from "./user-add-dialog"
 
 export function UsersHeader() {
   return (
-    <div className="flex items-center justify-between pt-4">
+    <div className="flex md:items-center items-start justify-between pt-4 flex-col md:flex-row gap-4">
       <div className="flex flex-col gap-1">
         <h1 className="text-3xl font-bold">Manajemen User</h1>
         <p className="text-lg text-muted-foreground">
           Kelola hak akses pengguna aplikasi
         </p>
       </div>
-      <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2 h-12">
-        <Plus className="h-4 w-4" />
-        Tambah User
-      </Button>
+      
+      <UserAddDialog />
     </div>
   )
 }

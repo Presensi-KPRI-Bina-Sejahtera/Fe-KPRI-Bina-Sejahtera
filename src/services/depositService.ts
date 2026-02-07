@@ -37,7 +37,7 @@ export type DepositResponse = {
     angsuran: number
   }
   
-  deposits: DepositRecord[]
+  deposits: Array<DepositRecord>
 }
 
 export const getDepositList = async (params: DepositParams) => {

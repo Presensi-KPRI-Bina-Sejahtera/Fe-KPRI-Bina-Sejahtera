@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "@tanstack/react-router"
 import { Calendar, Filter } from "lucide-react"
+import type { DepositParams, DepositResponse } from "@/services/depositService"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
-import { DepositParams, DepositResponse } from "@/services/depositService"
 
 interface SetoranFiltersProps {
   currentFilters: DepositParams

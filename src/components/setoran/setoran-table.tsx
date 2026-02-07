@@ -8,8 +8,10 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { ArrowUpDown, Calendar, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
+import { toast } from "sonner"
 import type { ColumnDef, SortingState } from "@tanstack/react-table"
 
+import type { DepositRecord} from "@/services/depositService";
 import {
   Table,
   TableBody,
@@ -30,11 +32,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { DepositRecord, verifyDeposit } from "@/services/depositService"
-import { toast } from "sonner"
+import { verifyDeposit } from "@/services/depositService"
 
 interface SetoranTableProps {
-  data: DepositRecord[]
+  data: Array<DepositRecord>
   pagination: {
     pageIndex: number
     pageSize: number
