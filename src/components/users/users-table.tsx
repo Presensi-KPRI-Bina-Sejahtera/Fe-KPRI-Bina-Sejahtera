@@ -12,7 +12,7 @@ import { UserDeleteDialog } from "./user-delete-dialog"
 import { UserEditDialog } from "./user-edit-dialog"
 import type { ColumnDef, SortingState } from "@tanstack/react-table"
 
-import type { UserRecord} from "@/services/userService";
+import type { UserRecord } from "@/services/userService"
 import {
   Table,
   TableBody,
@@ -63,8 +63,8 @@ export function UsersTable({ data, pagination }: UsersTableProps) {
       setUserToDelete(null)
     },
     onError: (error: any) => {
-      console.error(error)
-      toast.error("Gagal menghapus user")
+      const errorMessage = error?.response?.data?.message || "Gagal menghapus user"
+      toast.error(errorMessage)
     },
   })
 

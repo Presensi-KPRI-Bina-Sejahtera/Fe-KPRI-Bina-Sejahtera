@@ -51,8 +51,8 @@ export function TokoTable({ data, pagination }: TokoTableProps) {
       setTokoToDelete(null)
     },
     onError: (error: any) => {
-      console.error(error)
-      toast.error('Gagal menghapus toko')
+      const errorMessage = error?.response?.data?.message || 'Gagal menghapus toko'
+      toast.error(errorMessage)
     },
   })
 

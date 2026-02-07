@@ -36,7 +36,6 @@ export function LoginForm({
   const handleAuthSuccess = (response: any) => {
     localStorage.setItem('token', response.data.token)
     localStorage.setItem('user', JSON.stringify(response.data.user))
-    toast.success('Login Berhasil!')
     router.navigate({ to: '/dashboard' })
   }
 
@@ -49,7 +48,6 @@ export function LoginForm({
       const response = await login(email, password)
       handleAuthSuccess(response)
     } catch (err: any) {
-      console.error('Login failed', err)
       const msg =
         err.response?.data?.message || 'Login gagal. Cek email/password.'
       setError(msg)
@@ -73,13 +71,12 @@ export function LoginForm({
       const response = await loginWithGoogle(idToken)
       handleAuthSuccess(response)
     } catch (err: any) {
-      console.error('Google Login failed', err)
       if (err.response) {
-        toast.error(`Server Error: ${JSON.stringify(err.response.data)}`)
+        const msg = err.response.data?.message || 'Login Google gagal.'
+        setError(msg)
       } else {
-        toast.error('Gagal menghubungi server')
+        setError('Gagal menghubungi server.')
       }
-      setError('Login Google gagal.')
     } finally {
       setIsLoading(false)
     }

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import type { UserRecord} from "@/services/userService";
+import type { UserRecord } from "@/services/userService"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -37,6 +37,7 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
   const [email, setEmail] = useState("")
   const [tokoId, setTokoId] = useState("")
   const [role, setRole] = useState<"admin" | "employee">("employee")
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
 
   const { data: tokoList } = useQuery({
     queryKey: ['toko-dropdown'],
@@ -50,6 +51,7 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
       setEmail(user.email)
       setRole(user.role as "admin" | "employee")
       setTokoId(user.presence_location_id ? String(user.presence_location_id) : "")
+      setFieldErrors({})
     }
   }, [user])
 
@@ -59,12 +61,30 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
       toast.success("User berhasil diperbarui")
       queryClient.invalidateQueries({ queryKey: ["users"] })
       onOpenChange(false)
+      setFieldErrors({})
     },
     onError: (error: any) => {
-      console.error(error)
-      toast.error("Gagal memperbarui user")
+      if (error.response?.data?.errors) {
+        setFieldErrors(error.response.data.errors)
+      }
+      toast.error(error.response?.data?.message || "Gagal memperbarui user")
     }
   })
+
+  const handleInputChange = (
+    setter: (value: string) => void, 
+    field: string, 
+    value: string
+  ) => {
+    setter(value)
+    if (fieldErrors[field]) {
+      setFieldErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
+    }
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -92,33 +112,51 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
           
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="edit-name" className="text-slate-500">Nama Lengkap</Label>
+              <Label htmlFor="edit-name" className={fieldErrors.name ? "text-red-500" : "text-slate-500"}>
+                Nama Lengkap
+              </Label>
               <Input 
                 id="edit-name" 
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => handleInputChange(setName, "name", e.target.value)}
+                className={fieldErrors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
                 required
               />
+              {fieldErrors.name && (
+                <p className="text-sm text-red-500">{fieldErrors.name[0]}</p>
+              )}
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="edit-username" className="text-slate-500">Username</Label>
+              <Label htmlFor="edit-username" className={fieldErrors.username ? "text-red-500" : "text-slate-500"}>
+                Username
+              </Label>
               <Input 
                 id="edit-username" 
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => handleInputChange(setUsername, "username", e.target.value)}
+                className={fieldErrors.username ? "border-red-500 focus-visible:ring-red-500" : ""}
               />
+              {fieldErrors.username && (
+                <p className="text-sm text-red-500">{fieldErrors.username[0]}</p>
+              )}
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="edit-email" className="text-slate-500">Email</Label>
+              <Label htmlFor="edit-email" className={fieldErrors.email ? "text-red-500" : "text-slate-500"}>
+                Email
+              </Label>
               <Input 
                 id="edit-email" 
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => handleInputChange(setEmail, "email", e.target.value)}
+                className={fieldErrors.email ? "border-red-500 focus-visible:ring-red-500" : ""}
                 required
               />
+              {fieldErrors.email && (
+                <p className="text-sm text-red-500">{fieldErrors.email[0]}</p>
+              )}
             </div>
 
             <div className="grid gap-2">

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Loader2, MapPin, Plus } from 'lucide-react'
+import { AlertCircle, Loader2, MapPin, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import { MapPicker } from './map-picker'
 import { Button } from '@/components/ui/button'
@@ -20,39 +20,52 @@ import { createToko, getAddressFromCoordinates } from '@/services/tokoService'
 export function TokoAddDialog() {
   const [open, setOpen] = useState(false)
   const queryClient = useQueryClient()
-  const [coords, setCoords] = useState({ lat: -6.2, lng: 106.816666 })
+  const [coords, setCoords] = useState({ lat: -7.7956, lng: 110.3695 })
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
   const [maxDistance, setMaxDistance] = useState(50)
   const [isLoadingAddress, setIsLoadingAddress] = useState(false)
+  const [error, setError] = useState('')
+  const [noAddressFound, setNoAddressFound] = useState('')
 
   const mutation = useMutation({
     mutationFn: createToko,
     onSuccess: () => {
-      toast.success('Toko berhasil ditambahkan')
       queryClient.invalidateQueries({ queryKey: ['toko'] })
       setOpen(false)
       setName('')
       setAddress('')
+      setError('')
+      setNoAddressFound('')
       setMaxDistance(50)
+      toast.success('Toko berhasil ditambahkan')
     },
-    onError: (error: any) => {
-      console.error(error)
-      toast.error('Gagal menambahkan toko')
+    onError: (err: any) => {
+      const errorMessage =
+        err?.response?.data?.message || 'Terjadi kesalahan saat menambahkan toko'
+      
+      setError(errorMessage)
+      toast.error(errorMessage)
     },
   })
 
   const handleLocationSelect = async (lat: number, lng: number) => {
+    setNoAddressFound('')
+    setError('')
+    
     setCoords({ lat, lng })
     setIsLoadingAddress(true)
+    
     try {
       const fetchedAddress = await getAddressFromCoordinates(lat, lng)
       if (fetchedAddress) {
         setAddress(fetchedAddress)
+      } else {
+        setNoAddressFound('Alamat tidak ditemukan untuk koordinat ini.')
       }
-    } catch (error) {
-      console.error('Failed to get address', error)
-      toast.error('Gagal mengambil alamat otomatis')
+    } catch (err) {
+      setNoAddressFound('Gagal mengambil detail alamat otomatis.')
+      toast.error('Gagal mengambil alamat dari peta')
     } finally {
       setIsLoadingAddress(false)
     }
@@ -90,6 +103,13 @@ export function TokoAddDialog() {
             Silakan masukkan data toko baru. Pin lokasi di peta untuk mengisi
             alamat otomatis.
           </DialogDescription>
+          
+          {error && (
+            <div className="flex items-center gap-2 p-3 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-md animate-in fade-in slide-in-from-top-1">
+              <AlertCircle className="h-4 w-4" />
+              {error}
+            </div>
+          )}
         </DialogHeader>
 
         <div className="grid gap-6 py-4">
@@ -102,14 +122,24 @@ export function TokoAddDialog() {
               placeholder="Contoh: Toko Cabang Utara"
               className="bg-slate-50"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => {
+                setName(e.target.value)
+                setError('')
+              }}
             />
           </div>
 
           <div className="space-y-4 rounded-lg border p-4 bg-slate-50/50">
-            <div className="flex items-center gap-2 text-rose-500 font-medium">
-              <MapPin className="size-5" />
-              <span className="text-slate-900">Lokasi Toko</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-rose-500 font-medium">
+                <MapPin className="size-5" />
+                <span className="text-slate-900">Lokasi Toko</span>
+              </div>
+              {noAddressFound && (
+                <span className="text-xs text-red-500 font-medium">
+                  {noAddressFound}
+                </span>
+              )}
             </div>
 
             <MapPicker
@@ -138,19 +168,23 @@ export function TokoAddDialog() {
             </div>
 
             <div className="space-y-2">
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <Label className="text-slate-600">Alamat</Label>
                 {isLoadingAddress && (
-                  <span className="text-xs text-blue-500 animate-pulse">
-                    Mengambil alamat...
-                  </span>
+                  <div className="flex items-center gap-1 text-xs text-blue-500">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <span>Mengambil alamat...</span>
+                  </div>
                 )}
               </div>
               <Input
                 placeholder="Jl. Jendral Sudirman..."
-                className="bg-white"
+                className={`bg-white ${noAddressFound ? 'border-red-300 focus-visible:ring-red-200' : ''}`}
                 value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                onChange={(e) => {
+                  setAddress(e.target.value)
+                  setNoAddressFound('')
+                }}
               />
             </div>
 
@@ -160,6 +194,7 @@ export function TokoAddDialog() {
               </Label>
               <Input
                 type="number"
+                min="1"
                 value={maxDistance}
                 onChange={(e) => setMaxDistance(Number(e.target.value))}
                 className="bg-white"
@@ -183,7 +218,7 @@ export function TokoAddDialog() {
           <Button
             className="md:w-[50%] w-full bg-slate-900 text-white hover:bg-slate-800 h-12"
             onClick={handleSubmit}
-            disabled={mutation.isPending}
+            disabled={mutation.isPending || isLoadingAddress}
           >
             {mutation.isPending && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

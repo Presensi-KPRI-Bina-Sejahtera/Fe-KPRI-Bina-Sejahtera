@@ -1,27 +1,20 @@
 import { useEffect, useState } from 'react'
-import {
-  MapContainer,
-  Marker,
-  TileLayer,
-  useMap,
-  useMapEvents,
-} from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet'
+import { Search, Loader2, AlertCircle } from 'lucide-react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { Loader2, Search } from 'lucide-react'
-import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
-// @ts-ignore
-delete L.Icon.Default.prototype._getIconUrl
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
+import markerIcon from 'leaflet/dist/images/marker-icon.png'
+import markerShadow from 'leaflet/dist/images/marker-shadow.png'
+
+delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl:
-    'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIcon2x,
+  shadowUrl: markerShadow,
 })
 
 interface MapPickerProps {
@@ -30,125 +23,112 @@ interface MapPickerProps {
   onLocationSelect: (lat: number, lng: number) => void
 }
 
-function LocationMarker({
-  lat,
-  lng,
-  onSelect,
-}: {
-  lat: number
-  lng: number
-  onSelect: (lat: number, lng: number) => void
-}) {
-  const map = useMapEvents({
+function LocationMarker({ 
+  lat, 
+  lng, 
+  onLocationSelect 
+}: MapPickerProps) {
+  const map = useMap()
+  
+  useEffect(() => {
+    map.flyTo([lat, lng], map.getZoom())
+  }, [lat, lng, map])
+
+  useMapEvents({
     click(e) {
-      onSelect(e.latlng.lat, e.latlng.lng)
-      map.flyTo(e.latlng, map.getZoom())
+      onLocationSelect(e.latlng.lat, e.latlng.lng)
     },
   })
 
   return <Marker position={[lat, lng]} />
 }
 
-function FlyToLocation({ lat, lng }: { lat: number; lng: number }) {
-  const map = useMap()
-
-  useEffect(() => {
-    if (lat && lng) {
-      map.flyTo([lat, lng], 15, { animate: true })
-    }
-  }, [lat, lng, map])
-
-  return null
-}
-
 export function MapPicker({ lat, lng, onLocationSelect }: MapPickerProps) {
-  const [isMounted, setIsMounted] = useState(false)
-
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
+  const [searchError, setSearchError] = useState('')
 
-  useEffect(() => setIsMounted(true), [])
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!searchQuery.trim()) return
 
-  const handleSearch = async () => {
-    if (!searchQuery) return
     setIsSearching(true)
+    setSearchError('')
 
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`,
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          searchQuery
+        )}`
       )
       const data = await response.json()
 
       if (data && data.length > 0) {
-        const firstResult = data[0]
-        const newLat = parseFloat(firstResult.lat)
-        const newLng = parseFloat(firstResult.lon)
+        const result = data[0]
+        const newLat = parseFloat(result.lat)
+        const newLng = parseFloat(result.lon)
         onLocationSelect(newLat, newLng)
-        toast.success(
-          `Lokasi ditemukan: ${firstResult.display_name.split(',')[0]}`,
-        )
       } else {
-        toast.error('Lokasi tidak ditemukan')
+        setSearchError('Lokasi tidak ditemukan. Coba kata kunci lain.')
       }
     } catch (error) {
-      console.error('Search error:', error)
-      toast.error('Gagal mencari lokasi')
+      setSearchError('Gagal mencari lokasi. Periksa koneksi internet.')
     } finally {
       setIsSearching(false)
     }
   }
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      handleSearch()
-    }
-  }
-
-  if (!isMounted)
-    return (
-      <div className="h-[250px] w-full bg-slate-100 animate-pulse rounded-md" />
-    )
-
   return (
-    <div className="space-y-3">
-      <div className="flex gap-2">
-        <Input
-          placeholder="Cari lokasi (Contoh: Monas Jakarta)..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          onKeyDown={handleKeyDown}
-          disabled={isSearching}
-        />
-        <Button
-          type="button"
-          className="bg-blue-500 hover:bg-blue-600 text-white gap-2"
-          onClick={handleSearch}
-          disabled={isSearching}
-        >
-          {isSearching ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Search className="h-4 w-4" />
-          )}
-          Cari
-        </Button>
+    <div className="flex flex-col gap-3 w-full">
+      <div className="flex flex-col gap-2">
+        <form onSubmit={handleSearch} className="flex w-full gap-2">
+          <Input 
+            className="bg-white border-slate-300 focus:bg-white"
+            placeholder="Cari lokasi (contoh: Malioboro, Yogyakarta)..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value)
+              if (searchError) setSearchError('')
+            }}
+          />
+          <Button 
+            type="submit" 
+            size="icon" 
+            disabled={isSearching}
+            className="bg-slate-900 text-white hover:bg-slate-800 shrink-0"
+          >
+            {isSearching ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Search className="h-4 w-4" />
+            )}
+          </Button>
+        </form>
+        
+        {searchError && (
+          <div className="bg-red-50 border border-red-200 text-red-600 text-xs px-3 py-2 rounded-md shadow-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
+            <AlertCircle className="w-3 h-3 flex-shrink-0" />
+            <span>{searchError}</span>
+          </div>
+        )}
       </div>
 
-      <div className="h-[250px] w-full rounded-md overflow-hidden border border-slate-200 relative z-0">
+      <div className="h-[300px] w-full rounded-md overflow-hidden border border-slate-200 shadow-sm relative z-0">
         <MapContainer
           center={[lat, lng]}
           zoom={13}
-          scrollWheelZoom={false}
+          className="w-full h-full"
           style={{ height: '100%', width: '100%' }}
         >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-
-          <LocationMarker lat={lat} lng={lng} onSelect={onLocationSelect} />
-          <FlyToLocation lat={lat} lng={lng} />
+          <LocationMarker 
+            lat={lat} 
+            lng={lng} 
+            onLocationSelect={onLocationSelect} 
+          />
         </MapContainer>
       </div>
     </div>

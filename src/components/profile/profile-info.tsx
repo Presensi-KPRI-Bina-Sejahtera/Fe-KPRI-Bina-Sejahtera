@@ -18,10 +18,12 @@ export function ProfileInfo({ user }: ProfileInfoProps) {
   const queryClient = useQueryClient()
   const [name, setName] = useState(user.name)
   const [email, setEmail] = useState(user.email)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
 
   useEffect(() => {
     setName(user.name)
     setEmail(user.email)
+    setFieldErrors({})
   }, [user])
 
   const mutation = useMutation({
@@ -33,10 +35,13 @@ export function ProfileInfo({ user }: ProfileInfoProps) {
     onSuccess: () => {
       toast.success('Profil berhasil diperbarui')
       queryClient.invalidateQueries({ queryKey: ['profile'] })
+      setFieldErrors({})
     },
     onError: (error: any) => {
-      console.error(error)
-      toast.error('Gagal memperbarui profil')
+      if (error.response?.data?.errors) {
+        setFieldErrors(error.response.data.errors)
+      }
+      toast.error(error.response?.data?.message || 'Gagal memperbarui profil')
     },
   })
 
@@ -48,6 +53,22 @@ export function ProfileInfo({ user }: ProfileInfoProps) {
   const handleCancel = () => {
     setName(user.name)
     setEmail(user.email)
+    setFieldErrors({})
+  }
+
+  const handleInputChange = (
+    setter: (value: string) => void,
+    field: string,
+    value: string
+  ) => {
+    setter(value)
+    if (fieldErrors[field]) {
+      setFieldErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
+    }
   }
 
   const hasChanges = name !== user.name || email !== user.email
@@ -64,28 +85,45 @@ export function ProfileInfo({ user }: ProfileInfoProps) {
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="name">Nama</Label>
+            <Label 
+              htmlFor="name" 
+              className={fieldErrors.name ? "text-red-500" : ""}
+            >
+              Nama
+            </Label>
             <Input
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) => handleInputChange(setName, "name", e.target.value)}
               disabled={mutation.isPending}
+              className={fieldErrors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
             />
+            {fieldErrors.name && (
+              <p className="text-sm text-red-500">{fieldErrors.name[0]}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Alamat Email</Label>
+            <Label 
+              htmlFor="email"
+              className={fieldErrors.email ? "text-red-500" : ""}
+            >
+              Alamat Email
+            </Label>
             <div className="relative">
-              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Mail className={`absolute left-3 top-2.5 h-4 w-4 ${fieldErrors.email ? "text-red-500" : "text-muted-foreground"}`} />
               <Input
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => handleInputChange(setEmail, "email", e.target.value)}
                 disabled={mutation.isPending || !canEditEmail}
-                className={!canEditEmail ? 'pl-9 bg-slate-50 text-muted-foreground cursor-not-allowed' : 'pl-9'}
+                className={`${!canEditEmail ? 'pl-9 bg-slate-50 text-muted-foreground cursor-not-allowed' : 'pl-9'} ${fieldErrors.email ? "border-red-500 focus-visible:ring-red-500" : ""}`}
               />
             </div>
+            {fieldErrors.email && (
+              <p className="text-sm text-red-500">{fieldErrors.email[0]}</p>
+            )}
             {!canEditEmail && (
               <Alert variant="destructive" className="py-2 h-auto bg-amber-50 text-amber-900 border-amber-200">
                 <AlertCircle className="h-4 w-4 text-amber-600" />

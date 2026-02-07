@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query"
 import { Loader2, Plus } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -41,6 +41,7 @@ export function UserAddDialog() {
   const [email, setEmail] = useState("")
   const [tokoId, setTokoId] = useState("")
   const [role, setRole] = useState<"admin" | "employee">("employee")
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
 
   const { data: tokoList } = useQuery({
     queryKey: ['toko-dropdown'],
@@ -58,10 +59,13 @@ export function UserAddDialog() {
       setEmail("")
       setTokoId("")
       setRole("employee")
+      setFieldErrors({})
     },
     onError: (error: any) => {
-      console.error(error)
-      toast.error("Gagal menambahkan user. Pastikan email belum terdaftar.")
+      if (error.response?.data?.errors) {
+        setFieldErrors(error.response.data.errors)
+      }
+      toast.error(error.response?.data?.message || "Gagal menambahkan user")
     }
   })
 
@@ -74,6 +78,21 @@ export function UserAddDialog() {
       role,
       presence_location_id: tokoId ? Number(tokoId) : null
     })
+  }
+
+  const handleInputChange = (
+    setter: (value: string) => void, 
+    field: string, 
+    value: string
+  ) => {
+    setter(value)
+    if (fieldErrors[field]) {
+      setFieldErrors(prev => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
+    }
   }
 
   return (
@@ -95,36 +114,54 @@ export function UserAddDialog() {
           
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
-              <Label htmlFor="name" className="text-slate-500">Nama Lengkap</Label>
+              <Label htmlFor="name" className={fieldErrors.name ? "text-red-500" : "text-slate-500"}>
+                Nama Lengkap
+              </Label>
               <Input 
                 id="name" 
                 placeholder="Masukkan nama" 
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => handleInputChange(setName, "name", e.target.value)}
+                className={fieldErrors.name ? "border-red-500 focus-visible:ring-red-500" : ""}
                 required
               />
+              {fieldErrors.name && (
+                <p className="text-sm text-red-500">{fieldErrors.name[0]}</p>
+              )}
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="username" className="text-slate-500">Username</Label>
+              <Label htmlFor="username" className={fieldErrors.username ? "text-red-500" : "text-slate-500"}>
+                Username
+              </Label>
               <Input 
                 id="username" 
                 placeholder="Masukkan Username" 
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => handleInputChange(setUsername, "username", e.target.value)}
+                className={fieldErrors.username ? "border-red-500 focus-visible:ring-red-500" : ""}
               />
+              {fieldErrors.username && (
+                <p className="text-sm text-red-500">{fieldErrors.username[0]}</p>
+              )}
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="email" className="text-slate-500">Email</Label>
+              <Label htmlFor="email" className={fieldErrors.email ? "text-red-500" : "text-slate-500"}>
+                Email
+              </Label>
               <Input 
                 id="email" 
                 type="email"
                 placeholder="Masukkan Email" 
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => handleInputChange(setEmail, "email", e.target.value)}
+                className={fieldErrors.email ? "border-red-500 focus-visible:ring-red-500" : ""}
                 required
               />
+              {fieldErrors.email && (
+                <p className="text-sm text-red-500">{fieldErrors.email[0]}</p>
+              )}
             </div>
 
             <div className="grid gap-2">
