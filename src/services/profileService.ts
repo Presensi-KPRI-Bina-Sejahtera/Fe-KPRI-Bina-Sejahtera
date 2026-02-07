@@ -28,7 +28,7 @@ export const getProfile = async () => {
 
 export const updateProfile = async (data: UpdateProfilePayload) => {
   const response = await api.put<{ status: string; data: ProfileData }>(
-    '/profile/update', 
+    '/profile/update',
     data
   )
   return response.data.data
@@ -36,7 +36,7 @@ export const updateProfile = async (data: UpdateProfilePayload) => {
 
 export const updatePassword = async (data: UpdatePasswordPayload) => {
   const response = await api.put<{ status: string; message: string }>(
-    '/profile/update-password', 
+    '/profile/update-password',
     data
   )
   return response.data
@@ -47,12 +47,12 @@ export const updatePhoto = async (file: File) => {
   formData.append('photo', file)
 
   const response = await api.post<{ status: string; data: ProfileData }>(
-    '/profile/photo', 
+    '/profile/photo',
     formData,
     {
-        params: {
-            _method: 'PUT'
-        },
+      params: {
+        _method: 'PUT',
+      },
       headers: {
         'Content-Type': 'multipart/form-data',
       },

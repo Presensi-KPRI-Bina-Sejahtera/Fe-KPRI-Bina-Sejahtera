@@ -1,27 +1,34 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Loader2, Mail, Save, User } from 'lucide-react'
+import { Loader2, Mail, Save, User, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import type { ProfileData } from '@/services/profileService'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { updateProfile } from '@/services/profileService'
 
 interface ProfileInfoProps {
-  user: ProfileData
+  user: ProfileData & { has_password?: boolean }
 }
 
 export function ProfileInfo({ user }: ProfileInfoProps) {
   const queryClient = useQueryClient()
   const [name, setName] = useState(user.name)
+  const [email, setEmail] = useState(user.email)
+
+  useEffect(() => {
+    setName(user.name)
+    setEmail(user.email)
+  }, [user])
 
   const mutation = useMutation({
     mutationFn: () =>
       updateProfile({
         name,
-        email: user.email,
+        email,
       }),
     onSuccess: () => {
       toast.success('Profil berhasil diperbarui')
@@ -40,7 +47,11 @@ export function ProfileInfo({ user }: ProfileInfoProps) {
 
   const handleCancel = () => {
     setName(user.name)
+    setEmail(user.email)
   }
+
+  const hasChanges = name !== user.name || email !== user.email
+  const canEditEmail = !!user.has_password
 
   return (
     <Card>
@@ -63,25 +74,33 @@ export function ProfileInfo({ user }: ProfileInfoProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">
-              Alamat Email (terhubung dengan Google)
-            </Label>
+            <Label htmlFor="email">Alamat Email</Label>
             <div className="relative">
               <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 id="email"
-                value={user.email}
-                disabled
-                className="pl-9 bg-slate-50 text-muted-foreground cursor-not-allowed"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={mutation.isPending || !canEditEmail}
+                className={!canEditEmail ? 'pl-9 bg-slate-50 text-muted-foreground cursor-not-allowed' : 'pl-9'}
               />
             </div>
+            {!canEditEmail && (
+              <Alert variant="destructive" className="py-2 h-auto bg-amber-50 text-amber-900 border-amber-200">
+                <AlertCircle className="h-4 w-4 text-amber-600" />
+                <AlertDescription className="text-xs ml-2 translate-y-0.5">
+                  Anda harus membuat kata sandi terlebih dahulu untuk mengubah email.
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
 
           <div className="flex gap-4">
             <Button
               type="submit"
               className="bg-slate-900 text-white hover:bg-slate-800 gap-2"
-              disabled={mutation.isPending || name === user.name}
+              disabled={mutation.isPending || !hasChanges}
             >
               {mutation.isPending ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -91,14 +110,16 @@ export function ProfileInfo({ user }: ProfileInfoProps) {
               {mutation.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
             </Button>
 
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleCancel}
-              disabled={mutation.isPending || name === user.name}
-            >
-              Batal
-            </Button>
+            {hasChanges && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCancel}
+                disabled={mutation.isPending}
+              >
+                Batal
+              </Button>
+            )}
           </div>
         </form>
       </CardContent>

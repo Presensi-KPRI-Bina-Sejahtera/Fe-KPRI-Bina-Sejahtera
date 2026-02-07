@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { Eye, EyeOff, Loader2, Lock } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Lock, KeyRound } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -28,7 +28,7 @@ export function ProfilePassword({ hasPassword }: ProfilePasswordProps) {
         password_confirmation: confirmPassword,
       }),
     onSuccess: () => {
-      toast.success('Kata sandi berhasil diperbarui')
+      toast.success(hasPassword ? 'Kata sandi berhasil diperbarui' : 'Kata sandi berhasil dibuat')
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
@@ -36,7 +36,7 @@ export function ProfilePassword({ hasPassword }: ProfilePasswordProps) {
     onError: (error: any) => {
       console.error(error)
       toast.error(
-        error.response?.data?.message || 'Gagal memperbarui kata sandi',
+        error.response?.data?.message || 'Gagal memproses kata sandi',
       )
     },
   })
@@ -61,8 +61,8 @@ export function ProfilePassword({ hasPassword }: ProfilePasswordProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base font-medium">
-          <Lock className="w-4 h-4" />
-          Atur Kata Sandi
+          {hasPassword ? <Lock className="w-4 h-4" /> : <KeyRound className="w-4 h-4" />}
+          {hasPassword ? 'Ganti Kata Sandi' : 'Buat Kata Sandi'}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -156,15 +156,22 @@ export function ProfilePassword({ hasPassword }: ProfilePasswordProps) {
           <Button
             type="submit"
             variant="outline"
-            className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700 gap-2 w-full md:w-auto"
+            className={`gap-2 w-full md:w-auto ${
+              hasPassword 
+                ? "text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700" 
+                : "text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+            }`}
             disabled={mutation.isPending}
           >
             {mutation.isPending ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <Lock className="w-4 h-4" />
+              hasPassword ? <Lock className="w-4 h-4" /> : <KeyRound className="w-4 h-4" />
             )}
-            {mutation.isPending ? 'Memperbarui...' : 'Perbarui Kata Sandi'}
+            {mutation.isPending 
+              ? 'Menyimpan...' 
+              : (hasPassword ? 'Perbarui Kata Sandi' : 'Simpan Kata Sandi')
+            }
           </Button>
         </form>
       </CardContent>

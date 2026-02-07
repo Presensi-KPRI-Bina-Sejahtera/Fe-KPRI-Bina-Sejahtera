@@ -1,10 +1,11 @@
 import * as React from 'react'
 import { Link } from '@tanstack/react-router'
-import { LogOut } from 'lucide-react'
+import { LogOut, User } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
 import { navItems } from './nav-data'
 import { SearchBar } from './search-bar'
 import { logout } from '@/services/authService'
-import { useUserProfile } from '@/hooks/use-user-profile'
+import { getProfile } from '@/services/profileService'
 import {
   Sidebar,
   SidebarContent,
@@ -22,16 +23,19 @@ export function AppSidebar({
   pathname,
   ...props
 }: React.ComponentProps<typeof Sidebar> & { pathname: string }) {
-  
-  const { data: user } = useUserProfile()
+  const { data: user } = useQuery({
+    queryKey: ['profile'],
+    queryFn: getProfile,
+    staleTime: 1000 * 60 * 5,
+  })
 
   const getInitials = (name: string) => {
-    return name
-      ?.split(' ')
+    return (name || 'User')
+      .split(' ')
       .map((n) => n[0])
       .join('')
       .toUpperCase()
-      .substring(0, 2) || 'YK'
+      .substring(0, 2)
   }
 
   return (
@@ -107,22 +111,22 @@ export function AppSidebar({
                 <div className="flex h-10 w-10 items-center justify-center rounded-full border">
                   <Avatar className="h-full w-full">
                     <AvatarImage
-                      src={user?.profile_image} 
-                      alt={user?.name || "User"}
+                      src={user?.profile_image || undefined}
+                      alt={user?.name || 'User'}
                       className="object-cover"
                     />
                     <AvatarFallback className="bg-slate-200 text-slate-700 font-bold">
-                      {user?.name ? getInitials(user.name) : "YK"}
+                      {user?.name ? getInitials(user.name) : <User className="w-5 h-5" />}
                     </AvatarFallback>
                   </Avatar>
                 </div>
 
                 <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                   <span className="truncate font-semibold">
-                    {user?.name || "Pengguna"}
+                    {user?.name || 'Pengguna'}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    {user?.email || "Memuat..."}
+                    {user?.email || 'Memuat...'}
                   </span>
                 </div>
               </Link>
@@ -135,10 +139,10 @@ export function AppSidebar({
               className="bg-[#E11D48] hover:bg-[#BE123C] text-white group-data-[collapsible=icon]:!p-2.5"
               onClick={logout}
             >
-                <LogOut />
-                <span className="group-data-[collapsible=icon]:hidden">
-                  Log out
-                </span>
+              <LogOut />
+              <span className="group-data-[collapsible=icon]:hidden">
+                Log out
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

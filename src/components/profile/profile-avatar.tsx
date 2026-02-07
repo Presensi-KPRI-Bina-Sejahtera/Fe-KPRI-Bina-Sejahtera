@@ -17,7 +17,7 @@ export function ProfileAvatar({ user }: ProfileAvatarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const mutation = useMutation({
-    mutationFn: (file: File) => updatePhoto(file),
+    mutationFn: updatePhoto,
     onSuccess: () => {
       toast.success('Foto profil berhasil diperbarui')
       queryClient.invalidateQueries({ queryKey: ['profile'] })
@@ -45,7 +45,7 @@ export function ProfileAvatar({ user }: ProfileAvatarProps) {
         <div className="relative">
           <Avatar className="h-24 w-24 border-2 border-slate-100">
             <AvatarImage
-              src={user.profile_image || '/avatars/default.png'}
+              src={user.profile_image || undefined}
               className="object-cover"
             />
             <AvatarFallback className="bg-slate-100 text-slate-600 font-bold text-xl">

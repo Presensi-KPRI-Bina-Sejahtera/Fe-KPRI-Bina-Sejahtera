@@ -7,6 +7,8 @@ export type User = {
   email: string
   role: string
   profile_image: string | null
+  has_password?: boolean
+  google_id?: string | null
 }
 
 export type LoginResponse = {
@@ -19,29 +21,23 @@ export type LoginResponse = {
   }
 }
 
+export const fetchUserProfile = async () => {
+  const response = await api.get<{ status: string; data: User }>('/profile/me')
+  return response.data.data
+}
+
 export const login = async (email: string, password: string) => {
   const response = await api.post<LoginResponse>('/auth/login', {
     email,
     password,
   })
-  
-  return response.data
-}
 
-export const isAuthenticated = () => {
-  if (typeof window === 'undefined') {
-    return false
-  }
-  
-  return !!localStorage.getItem('token')
-}
-
-export const logout = () => {
   if (typeof window !== 'undefined') {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    window.location.href = '/login'
+    localStorage.setItem('token', response.data.data.token)
+    localStorage.setItem('user', JSON.stringify(response.data.data.user))
   }
+
+  return response.data
 }
 
 export const loginWithGoogle = async (idToken: string) => {
@@ -50,5 +46,53 @@ export const loginWithGoogle = async (idToken: string) => {
   formData.append('device_name', 'web')
 
   const response = await api.post('/auth/login-google', formData)
-  return response.data
+
+  const token = response.data.data?.token
+  let user = response.data.data?.user
+
+  if (typeof window !== 'undefined' && token) {
+    localStorage.setItem('token', token)
+
+    if (!user) {
+      try {
+        console.log("User missing from login response, fetching manually...")
+        user = await fetchUserProfile()
+      } catch (error) {
+        console.error('Failed to fetch user profile after Google login', error)
+      }
+    }
+
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user))
+    }
+  }
+
+  return {
+    ...response.data,
+    data: {
+      ...response.data.data,
+      user: user,
+    },
+  }
+}
+
+export const isAuthenticated = () => {
+  if (typeof window === 'undefined') {
+    return false
+  }
+  return !!localStorage.getItem('token')
+}
+
+export const logout = async () => {
+  try {
+    await api.post('/auth/logout')
+  } catch (err) {
+    console.warn('Logout endpoint failed, forcing local logout anyway.', err)
+  } finally {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      window.location.href = '/login'
+    }
+  }
 }

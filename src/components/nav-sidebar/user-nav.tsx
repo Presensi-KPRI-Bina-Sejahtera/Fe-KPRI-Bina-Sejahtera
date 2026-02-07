@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router"
+import { useQuery } from "@tanstack/react-query"
 import {
   ChevronDown,
   LogOut,
@@ -20,18 +21,22 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { logout } from "@/services/authService"
-import { useUserProfile } from "@/hooks/use-user-profile"
+import { getProfile } from "@/services/profileService"
 
 export function UserNav() {
-  const { data: user } = useUserProfile()
+  const { data: user } = useQuery({
+    queryKey: ['profile'],
+    queryFn: getProfile,
+    staleTime: 1000 * 60 * 5, 
+  })
 
   const getInitials = (name: string) => {
-    return name
-      ?.split(' ')
+    return (name || 'User')
+      .split(' ')
       .map((n) => n[0])
       .join('')
       .toUpperCase()
-      .substring(0, 2) || 'US'
+      .substring(0, 2)
   }
 
   return (
@@ -40,8 +45,8 @@ export function UserNav() {
         <Button variant="ghost" className="hover:bg-slate-100 h-12 gap-2 px-2">
           <Avatar className="h-9 w-9 border border-slate-200">
             <AvatarImage 
-              src={user?.profile_image} 
-              alt={user?.name} 
+              src={user?.profile_image || undefined} 
+              alt={user?.name || "User"} 
               className="object-cover" 
             />
             <AvatarFallback className="bg-slate-200 text-slate-700 font-bold text-xs">
