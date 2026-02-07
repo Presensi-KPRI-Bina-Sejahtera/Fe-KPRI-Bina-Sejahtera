@@ -67,5 +67,5 @@ export const exportCashflowExcel = async (params: CashflowParams) => {
     responseType: 'blob',
   })
 
-  return response.data
+  return response
 }

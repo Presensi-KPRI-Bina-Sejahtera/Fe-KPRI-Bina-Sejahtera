@@ -80,5 +80,5 @@ export const exportDepositExcel = async (params: DepositParams) => {
     responseType: 'blob',
   })
 
-  return response.data
+  return response
 }

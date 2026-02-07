@@ -80,5 +80,5 @@ export const exportAttendanceExcel = async (params: AttendanceParams) => {
     responseType: 'blob',
   })
 
-  return response.data
+  return response
 }
