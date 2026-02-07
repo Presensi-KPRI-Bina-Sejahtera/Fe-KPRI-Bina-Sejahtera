@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import { LogOut } from 'lucide-react'
-
 import { navItems } from './nav-data'
 import { SearchBar } from './search-bar'
 import { logout } from '@/services/authService'
+import { useUserProfile } from '@/hooks/use-user-profile'
 import {
   Sidebar,
   SidebarContent,
@@ -22,6 +22,18 @@ export function AppSidebar({
   pathname,
   ...props
 }: React.ComponentProps<typeof Sidebar> & { pathname: string }) {
+  
+  const { data: user } = useUserProfile()
+
+  const getInitials = (name: string) => {
+    return name
+      ?.split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2) || 'YK'
+  }
+
   return (
     <Sidebar collapsible="icon" {...props} className="pt-4">
       <SidebarHeader>
@@ -35,7 +47,7 @@ export function AppSidebar({
                 <img
                   src="/logo.png"
                   alt="Logo"
-                  className="size-10   object-contain"
+                  className="size-10 object-contain"
                 />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -95,20 +107,22 @@ export function AppSidebar({
                 <div className="flex h-10 w-10 items-center justify-center rounded-full border">
                   <Avatar className="h-full w-full">
                     <AvatarImage
-                      src="/office.png"
-                      alt="User"
+                      src={user?.profile_image} 
+                      alt={user?.name || "User"}
                       className="object-cover"
                     />
-                    <AvatarFallback>AH</AvatarFallback>
+                    <AvatarFallback className="bg-slate-200 text-slate-700 font-bold">
+                      {user?.name ? getInitials(user.name) : "YK"}
+                    </AvatarFallback>
                   </Avatar>
                 </div>
 
                 <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                   <span className="truncate font-semibold">
-                    Afif Habiburrohman
+                    {user?.name || "Pengguna"}
                   </span>
                   <span className="truncate text-xs text-muted-foreground">
-                    afif@example.com
+                    {user?.email || "Memuat..."}
                   </span>
                 </div>
               </Link>

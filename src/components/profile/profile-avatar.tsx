@@ -1,11 +1,12 @@
 import { useRef } from "react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { Camera, Loader2 } from "lucide-react"
+import { toast } from "sonner"
+import type { ProfileData} from "@/services/profileService";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { ProfileData, updatePhoto } from "@/services/profileService"
-import { toast } from "sonner"
+import { updatePhoto } from "@/services/profileService"
 
 interface ProfileAvatarProps {
   user: ProfileData

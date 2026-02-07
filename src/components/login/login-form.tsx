@@ -1,11 +1,10 @@
-"use client"
-
 import * as React from "react"
 import { useState } from "react"
 import { useRouter } from "@tanstack/react-router"
 import { AlertCircle, Loader2 } from "lucide-react"
-import { login } from "@/services/authService"
-
+import { GoogleLogin } from '@react-oauth/google'
+import { toast } from "sonner"
+import { login, loginWithGoogle } from "@/services/authService"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -34,6 +33,13 @@ export function LoginForm({
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
+  const handleAuthSuccess = (response: any) => {
+    localStorage.setItem("token", response.data.token)
+    localStorage.setItem("user", JSON.stringify(response.data.user))
+    toast.success("Login Berhasil!")
+    router.navigate({ to: "/dashboard" })
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -41,16 +47,39 @@ export function LoginForm({
 
     try {
       const response = await login(email, password)
-
-      localStorage.setItem("token", response.data.token)
-      localStorage.setItem("user", JSON.stringify(response.data.user))
-
-      router.navigate({ to: "/dashboard" }) 
-
+      handleAuthSuccess(response)
     } catch (err: any) {
       console.error("Login failed", err)
       const msg = err.response?.data?.message || "Login gagal. Cek email/password."
       setError(msg)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    const idToken = credentialResponse.credential;
+
+    if (!idToken) {
+      setError("Gagal menerima token dari Google");
+      return;
+    }
+
+    setIsLoading(true)
+    setError("")
+
+    try {
+      const response = await loginWithGoogle(idToken)
+      handleAuthSuccess(response)
+
+    } catch (err: any) {
+      console.error("Google Login failed", err)
+      if (err.response) {
+         toast.error(`Server Error: ${JSON.stringify(err.response.data)}`);
+      } else {
+         toast.error("Gagal menghubungi server");
+      }
+      setError("Login Google gagal.")
     } finally {
       setIsLoading(false)
     }
@@ -122,14 +151,36 @@ export function LoginForm({
               <FieldSeparator>Atau lanjutkan dengan</FieldSeparator>
               
               <Field>
-                <Button variant="outline" type="button" className="font-bold p-5" disabled={isLoading}>
-                  <img
-                    src="/google.svg"
-                    alt="Google Logo"
-                    className="h-4 w-4 mr-2"
-                  />
-                  Masuk Dengan Google
-                </Button>
+                
+                <div className="relative w-full h-12">
+                  <Button 
+                    variant="outline" 
+                    type="button" 
+                    className="absolute inset-0 w-full h-full font-bold p-5 z-0" 
+                    disabled={isLoading}
+                  >
+                    <img
+                      src="/google.svg"
+                      alt="Google Logo"
+                      className="h-4 w-4 mr-2"
+                    />
+                    Masuk Dengan Google
+                  </Button>
+
+                  <div className="absolute inset-0 z-10 opacity-0 overflow-hidden">
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={() => {
+                        setError("Gagal inisialisasi Google Login");
+                        toast.error("Google Login Failed");
+                      }}
+                      useOneTap={false}
+                      width="500"
+                      text="signin_with"
+                    />
+                  </div>
+
+                </div>
                 
                 <Button type="submit" className="font-bold bg-primary p-5" disabled={isLoading}>
                   {isLoading ? (

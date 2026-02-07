@@ -1,12 +1,12 @@
 import { useState } from "react"
 import { useMutation } from "@tanstack/react-query"
-import { Eye, EyeOff, Lock, Loader2 } from "lucide-react"
+import { Eye, EyeOff, Loader2, Lock } from "lucide-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { updatePassword } from "@/services/profileService"
-import { toast } from "sonner"
 
 interface ProfilePasswordProps {
   hasPassword: boolean

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from "react-leaflet"
+import L from "leaflet"
+import "leaflet/dist/leaflet.css"
 import { Loader2, Search } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import "leaflet/dist/leaflet.css"
-import L from "leaflet"
 
+// Because Leaflet's default icon URLs are hardcoded, we need to set them manually
 // @ts-ignore
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({

@@ -1,20 +1,22 @@
 import {
   HeadContent,
   Link,
-  Scripts, createRootRouteWithContext 
+  Scripts,
+  createRootRouteWithContext,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-
+import { GoogleOAuthProvider } from '@react-oauth/google'
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
-
 import appCss from '../styles.css?url'
-
 import type { QueryClient } from '@tanstack/react-query'
 
 interface MyRouterContext {
   queryClient: QueryClient
 }
+
+const GOOGLE_CLIENT_ID =
+  '364805871560-5sbnmaojh82j4c4hn29a64nni1f7p8vs.apps.googleusercontent.com'
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
@@ -60,7 +62,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+          {children}
+        </GoogleOAuthProvider>
         <TanStackDevtools
           config={{
             position: 'bottom-right',

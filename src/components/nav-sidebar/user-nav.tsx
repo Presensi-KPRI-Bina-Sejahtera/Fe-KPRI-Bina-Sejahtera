@@ -1,10 +1,8 @@
+import { Link } from "@tanstack/react-router"
 import {
-  Bell,
   ChevronDown,
-  CreditCard,
   LogOut,
-  Settings,
-  User
+  User as UserIcon,
 } from "lucide-react"
 
 import {
@@ -22,52 +20,67 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
+import { logout } from "@/services/authService"
+import { useUserProfile } from "@/hooks/use-user-profile"
 
 export function UserNav() {
-  const user = {
-    name: "Afif Habiburrohman",
-    email: "afif@example.com",
-    avatar: "/office.png",
+  const { data: user } = useUserProfile()
+
+  const getInitials = (name: string) => {
+    return name
+      ?.split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .substring(0, 2) || 'US'
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="hover:bg-slate-100 h-14">
-          <Avatar className="h-10 w-10 border border-slate-200">
-            <AvatarImage src={user.avatar} alt={user.name} className="object-cover" />
-            <AvatarFallback>AH</AvatarFallback>
+        <Button variant="ghost" className="hover:bg-slate-100 h-12 gap-2 px-2">
+          <Avatar className="h-9 w-9 border border-slate-200">
+            <AvatarImage 
+              src={user?.profile_image} 
+              alt={user?.name} 
+              className="object-cover" 
+            />
+            <AvatarFallback className="bg-slate-200 text-slate-700 font-bold text-xs">
+              {user?.name ? getInitials(user.name) : "..."}
+            </AvatarFallback>
           </Avatar>
-            <ChevronDown className="" />
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
       
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.name}</p>
+            <p className="text-sm font-medium leading-none">{user?.name || "Pengguna"}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              {user.email}
+              {user?.email || "Memuat..."}
             </p>
+            {user?.role && (
+               <p className="text-[10px] uppercase font-bold text-blue-600 bg-blue-50 w-fit px-1.5 py-0.5 rounded mt-1">
+                {user.role}
+              </p>
+            )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <CreditCard className="mr-2 h-4 w-4" />
-            <span>Billing</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Bell className="mr-2 h-4 w-4" />
-            <span>Notifications</span>
-          </DropdownMenuItem>
+          <Link to="/profile" className="w-full cursor-pointer">
+            <DropdownMenuItem className="cursor-pointer">
+              <UserIcon className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </DropdownMenuItem>
+          </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-red-600 focus:text-red-600">
+        <DropdownMenuItem 
+          className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
+          onClick={logout}
+        >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>

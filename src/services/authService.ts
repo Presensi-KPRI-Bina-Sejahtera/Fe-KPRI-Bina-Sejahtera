@@ -43,3 +43,12 @@ export const logout = () => {
     window.location.href = '/login'
   }
 }
+
+export const loginWithGoogle = async (idToken: string) => {
+  const formData = new FormData()
+  formData.append('id_token', idToken)
+  formData.append('device_name', 'web')
+
+  const response = await api.post('/auth/login-google', formData)
+  return response.data
+}
