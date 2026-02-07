@@ -52,3 +52,20 @@ export const getCashflowList = async (params: CashflowParams) => {
   
   return response.data.data
 }
+
+export const exportCashflowExcel = async (params: CashflowParams) => {
+  const { start_date, end_date, type } = params
+
+  const cleanParams = Object.fromEntries(
+    Object.entries({ start_date, end_date, type }).filter(
+      ([_, v]) => v != null && v !== '' && v !== 'all',
+    ),
+  )
+
+  const response = await api.get('/admin/cashflow/export-excel', {
+    params: cleanParams,
+    responseType: 'blob',
+  })
+
+  return response.data
+}

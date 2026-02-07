@@ -67,3 +67,18 @@ export const getUserDropdownList = async () => {
   )
   return response.data.data
 }
+
+export const exportAttendanceExcel = async (params: AttendanceParams) => {
+  const { start_date, end_date, user_id } = params
+  const cleanParams = Object.fromEntries(
+    Object.entries({ start_date, end_date, user_id }).filter(
+      ([_, v]) => v != null && v !== '',
+    ),
+  )
+  const response = await api.get('/admin/attendance/export-excel', {
+    params: cleanParams,
+    responseType: 'blob',
+  })
+
+  return response.data
+}

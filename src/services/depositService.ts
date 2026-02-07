@@ -65,3 +65,20 @@ export const verifyDeposit = async (id: number, code: string) => {
 
   return response.data.data
 }
+
+export const exportDepositExcel = async (params: DepositParams) => {
+  const { start_date, end_date, type, status, search } = params
+
+  const cleanParams = Object.fromEntries(
+    Object.entries({ start_date, end_date, type, status, search }).filter(
+      ([_, v]) => v != null && v !== '',
+    ),
+  )
+
+  const response = await api.get('/admin/deposit/export-excel', {
+    params: cleanParams,
+    responseType: 'blob',
+  })
+
+  return response.data
+}

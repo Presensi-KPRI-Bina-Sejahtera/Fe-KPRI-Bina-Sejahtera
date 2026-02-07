@@ -50,7 +50,7 @@ function SetoranPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <SetoranHeader />
+      <SetoranHeader currentFilters={search} />
       <SetoranFilters 
         currentFilters={search} 
         summary={data?.summary} 

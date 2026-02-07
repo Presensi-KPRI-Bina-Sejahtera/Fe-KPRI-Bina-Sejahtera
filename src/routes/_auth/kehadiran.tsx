@@ -2,7 +2,6 @@ import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useQuery } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
-
 import { getAttendanceList } from '@/services/attendanceService'
 import { KehadiranHeader } from '@/components/kehadiran/kehadiran-header'
 import { KehadiranFilters } from '@/components/kehadiran/kehadiran-filters'
@@ -50,12 +49,9 @@ function KehadiranPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <KehadiranHeader />
-      
+      <KehadiranHeader currentFilters={search} />
       <KehadiranFilters currentFilters={search} />
-      
       <KehadiranStats summary={data?.summary} />
-      
       <KehadiranTable 
         data={data?.attendances || []} 
         pagination={{

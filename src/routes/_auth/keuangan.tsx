@@ -50,7 +50,7 @@ function KeuanganPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <KeuanganHeader />
+      <KeuanganHeader currentFilters={search} />
       <KeuanganStats summary={data?.summary} />
       <KeuanganFilters currentFilters={search} />
       <KeuanganTable

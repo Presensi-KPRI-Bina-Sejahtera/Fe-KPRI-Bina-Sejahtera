@@ -20,11 +20,48 @@ export function KeuanganFilters({
 }) {
   const navigate = useNavigate()
 
-  const [filters, setFilters] = useState(currentFilters)
+  const getToday = () => {
+    const date = new Date()
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  const getFirstDayOfMonth = () => {
+    const date = new Date()
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    return `${year}-${month}-01`
+  }
+
+  const [filters, setFilters] = useState<CashflowParams>(() => ({
+    ...currentFilters,
+    start_date: currentFilters.start_date || getFirstDayOfMonth(),
+    end_date: currentFilters.end_date || getToday(),
+  }))
 
   useEffect(() => {
-    setFilters(currentFilters)
-  }, [currentFilters])
+    const defaultStart = getFirstDayOfMonth()
+    const defaultEnd = getToday()
+
+    const hasStart = !!currentFilters.start_date
+    const hasEnd = !!currentFilters.end_date
+
+    if (!hasStart || !hasEnd) {
+      navigate({
+        to: '/keuangan',
+        search: (prev: any) => ({
+          ...prev,
+          start_date: hasStart ? currentFilters.start_date : defaultStart,
+          end_date: hasEnd ? currentFilters.end_date : defaultEnd,
+        }),
+        replace: true,
+      })
+    } else {
+      setFilters(currentFilters)
+    }
+  }, [currentFilters, navigate])
 
   const applyFilter = (key: keyof CashflowParams, value: any) => {
     const newFilters = { ...filters, [key]: value }

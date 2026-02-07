@@ -2,11 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Calendar, Search, User, X } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
-import type {AttendanceParams} from '@/services/attendanceService';
-import {
-  
-  getUserDropdownList
-} from '@/services/attendanceService'
+import type { AttendanceParams } from '@/services/attendanceService'
+import { getUserDropdownList } from '@/services/attendanceService'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -32,11 +29,47 @@ export function KehadiranFilters({
     staleTime: 1000 * 60 * 5,
   })
 
-  const [filters, setFilters] = useState(currentFilters)
+  const getToday = () => {
+    const date = new Date()
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  const getFirstDayOfMonth = () => {
+    const date = new Date()
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    return `${year}-${month}-01`
+  }
+
+  const [filters, setFilters] = useState<AttendanceParams>(() => ({
+    ...currentFilters,
+    start_date: currentFilters.start_date || getFirstDayOfMonth(),
+    end_date: currentFilters.end_date || getToday(),
+  }))
 
   useEffect(() => {
-    setFilters(currentFilters)
-  }, [currentFilters])
+    const defaultStart = getFirstDayOfMonth()
+    const defaultEnd = getToday()
+    const hasStart = !!currentFilters.start_date
+    const hasEnd = !!currentFilters.end_date
+
+    if (!hasStart || !hasEnd) {
+      navigate({
+        to: '/kehadiran',
+        search: (prev: any) => ({
+          ...prev,
+          start_date: hasStart ? currentFilters.start_date : defaultStart,
+          end_date: hasEnd ? currentFilters.end_date : defaultEnd,
+        }),
+        replace: true,
+      })
+    } else {
+      setFilters(currentFilters)
+    }
+  }, [currentFilters, navigate])
 
   const applyFilter = (key: keyof AttendanceParams, value: any) => {
     const newFilters = { ...filters, [key]: value }
@@ -106,7 +139,7 @@ export function KehadiranFilters({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Pegawai</SelectItem>
-              {users.map((user) => (
+              {users.map((user: any) => (
                 <SelectItem key={user.id} value={user.id.toString()}>
                   {user.name}
                 </SelectItem>

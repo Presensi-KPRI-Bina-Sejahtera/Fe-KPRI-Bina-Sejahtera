@@ -34,13 +34,11 @@ function ProfilePage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 mx-auto w-full max-w-4xl pb-10">
       <div className="flex flex-col gap-6">
         <ProfileHeader />
         <ProfileAvatar user={user} />
         <ProfileInfo user={user} />
         <ProfilePassword hasPassword={user.has_password} />
       </div>
-    </div>
   )
 }
