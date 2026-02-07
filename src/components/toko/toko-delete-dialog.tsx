@@ -1,7 +1,5 @@
-"use client"
-
-import { useState } from "react"
-import { Trash2 } from "lucide-react"
+import { AlertTriangle, Loader2 } from "lucide-react"
+import type { TokoRecord } from "@/services/tokoService"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -10,32 +8,68 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 
-export function TokoDeleteDialog() {
-  const [open, setOpen] = useState(false)
+interface TokoDeleteDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  toko: TokoRecord | null
+  onConfirm: (id: number) => void
+  isDeleting: boolean
+}
+
+export function TokoDeleteDialog({ 
+  open, 
+  onOpenChange, 
+  toko, 
+  onConfirm, 
+  isDeleting 
+}: TokoDeleteDialogProps) {
+  
+  const handleConfirm = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (toko) {
+      onConfirm(toko.id)
+    }
+  }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50">
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold">Hapus data toko?</DialogTitle>
-          <DialogDescription className="py-2 text-slate-500">
-            Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
+          <div className="flex items-center gap-2 text-rose-600 mb-2">
+            <AlertTriangle className="h-6 w-6" />
+            <DialogTitle className="text-xl font-bold">Hapus Toko?</DialogTitle>
+          </div>
+          <DialogDescription className="text-slate-600">
+            Apakah Anda yakin ingin menghapus <b>{toko?.name}</b>? 
+            <br />
+            Data yang dihapus tidak dapat dikembalikan dan presensi di lokasi ini tidak akan valid lagi.
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter className="gap-2 mt-2">
-          <Button variant="outline" className="md:w-[50%] w-full bg-slate-800 text-white hover:bg-slate-900 hover:text-white border-0 h-12" onClick={() => setOpen(false)}>
+        
+        <DialogFooter className="gap-2 mt-4 sm:gap-0">
+          <Button 
+            variant="outline" 
+            className="w-full sm:w-auto border-slate-200 hover:bg-slate-100 hover:text-slate-900" 
+            onClick={() => onOpenChange(false)}
+            disabled={isDeleting}
+          >
             Batal
           </Button>
-          <Button className="md:w-[50%] w-full bg-rose-600 text-white hover:bg-rose-700 h-12">
-            Ya, Hapus
+          <Button 
+            className="w-full sm:w-auto bg-rose-600 text-white hover:bg-rose-700" 
+            onClick={handleConfirm}
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Menghapus...
+              </>
+            ) : (
+              "Ya, Hapus"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
