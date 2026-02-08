@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet'
 import { Search, Loader2, AlertCircle } from 'lucide-react'
 import L from 'leaflet'
@@ -21,6 +21,13 @@ interface MapPickerProps {
   lat: number
   lng: number
   onLocationSelect: (lat: number, lng: number) => void
+}
+
+type NominatimSearchResult = {
+  place_id?: number
+  display_name?: string
+  lat: string
+  lon: string
 }
 
 function LocationMarker({ 
@@ -47,6 +54,81 @@ export function MapPicker({ lat, lng, onLocationSelect }: MapPickerProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
   const [searchError, setSearchError] = useState('')
+  const [suggestions, setSuggestions] = useState<NominatimSearchResult[]>([])
+  const [isSuggesting, setIsSuggesting] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const suggestAbortRef = useRef<AbortController | null>(null)
+  const suggestTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const selectSuggestion = (result: NominatimSearchResult) => {
+    const newLat = parseFloat(result.lat)
+    const newLng = parseFloat(result.lon)
+    if (Number.isNaN(newLat) || Number.isNaN(newLng)) return
+
+    setSearchQuery(result.display_name ?? searchQuery)
+    setSuggestions([])
+    setShowSuggestions(false)
+    onLocationSelect(newLat, newLng)
+  }
+
+  useEffect(() => {
+    const query = searchQuery.trim()
+
+    if (suggestTimerRef.current) {
+      clearTimeout(suggestTimerRef.current)
+      suggestTimerRef.current = null
+    }
+
+    if (query.length < 3) {
+      suggestAbortRef.current?.abort()
+      setIsSuggesting(false)
+      setSuggestions([])
+      setShowSuggestions(false)
+      return
+    }
+
+    suggestTimerRef.current = setTimeout(async () => {
+      suggestAbortRef.current?.abort()
+      const controller = new AbortController()
+      suggestAbortRef.current = controller
+      setIsSuggesting(true)
+
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${encodeURIComponent(query)}`,
+          {
+            signal: controller.signal,
+            headers: {
+              'Accept-Language': 'id',
+            },
+          }
+        )
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch suggestions')
+        }
+
+        const data = (await response.json()) as unknown
+        const results = Array.isArray(data) ? (data as NominatimSearchResult[]) : []
+
+        setSuggestions(results)
+        setShowSuggestions(results.length > 0)
+      } catch (error) {
+        if ((error as { name?: string })?.name === 'AbortError') return
+        setSuggestions([])
+        setShowSuggestions(false)
+      } finally {
+        setIsSuggesting(false)
+      }
+    }, 350)
+
+    return () => {
+      if (suggestTimerRef.current) {
+        clearTimeout(suggestTimerRef.current)
+        suggestTimerRef.current = null
+      }
+    }
+  }, [searchQuery])
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -54,6 +136,8 @@ export function MapPicker({ lat, lng, onLocationSelect }: MapPickerProps) {
 
     setIsSearching(true)
     setSearchError('')
+    setShowSuggestions(false)
+    setSuggestions([])
 
     try {
       const response = await fetch(
@@ -90,6 +174,13 @@ export function MapPicker({ lat, lng, onLocationSelect }: MapPickerProps) {
               setSearchQuery(e.target.value)
               if (searchError) setSearchError('')
             }}
+            onBlur={() => {
+              // Delay so click on suggestion still registers
+              setTimeout(() => setShowSuggestions(false), 150)
+            }}
+            onFocus={() => {
+              if (suggestions.length > 0) setShowSuggestions(true)
+            }}
           />
           <Button 
             type="submit" 
@@ -104,6 +195,26 @@ export function MapPicker({ lat, lng, onLocationSelect }: MapPickerProps) {
             )}
           </Button>
         </form>
+
+        {showSuggestions && suggestions.length > 0 && (
+          <div className="bg-white border border-slate-200 rounded-md shadow-sm overflow-hidden">
+            {suggestions.map((result, index) => (
+              <button
+                key={result.place_id ?? `${result.display_name ?? 'result'}-${index}`}
+                type="button"
+                className="w-full text-left px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => selectSuggestion(result)}
+              >
+                {result.display_name ?? 'Lokasi'}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {isSuggesting && !isSearching && searchQuery.trim().length >= 3 && suggestions.length === 0 && (
+          <div className="text-xs text-slate-500 px-1">Mencari saran...</div>
+        )}
         
         {searchError && (
           <div className="bg-red-50 border border-red-200 text-red-600 text-xs px-3 py-2 rounded-md shadow-sm font-medium flex items-center gap-2 animate-in fade-in slide-in-from-top-1">

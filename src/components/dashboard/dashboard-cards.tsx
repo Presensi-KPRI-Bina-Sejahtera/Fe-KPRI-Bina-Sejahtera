@@ -79,7 +79,7 @@ export function DashboardCards({
       </h2>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {items.map((item, index) => (
-          <Card key={index} className="shadow-lg border-3 border-slate-200">
+          <Card key={index} className="shadow-lg border-3 border-slate-200 p-0">
             <CardContent className="px-6 py-6 flex items-center justify-between">
               <div>
                 <div className="flex justify-between items-start">
