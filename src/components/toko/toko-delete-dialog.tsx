@@ -48,17 +48,17 @@ export function TokoDeleteDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <DialogFooter className="gap-2 mt-4 sm:gap-0">
+        <DialogFooter>
           <Button
             variant="outline"
-            className="w-full sm:w-auto border-slate-200 hover:bg-slate-100 hover:text-slate-900"
+            className="md:w-[50%] w-full bg-slate-900 text-white hover:text-white hover:bg-slate-800 h-12"
             onClick={() => onOpenChange(false)}
             disabled={isDeleting}
           >
             Batal
           </Button>
           <Button
-            className="w-full sm:w-auto bg-rose-600 text-white hover:bg-rose-700"
+            className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12"
             onClick={handleConfirm}
             disabled={isDeleting}
           >

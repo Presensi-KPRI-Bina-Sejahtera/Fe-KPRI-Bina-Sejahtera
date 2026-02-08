@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-table'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
-import { ArrowUpDown, Calendar, Loader2 } from 'lucide-react'
+import { ArrowUpDown, Calendar, Pencil } from 'lucide-react'
 import { toast } from 'sonner'
 import { DataTablePagination } from '../data-table-pagination'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
@@ -48,23 +48,52 @@ const formatRp = (val: number) => {
 
 const VerificationCell = ({ row }: { row: DepositRecord }) => {
   const queryClient = useQueryClient()
-  const [code, setCode] = React.useState('')
+  const [code, setCode] = React.useState(row.verified_key || '')
+  const [isEditing, setIsEditing] = React.useState(!row.verified_key)
+
+  React.useEffect(() => {
+    setCode(row.verified_key || '')
+    setIsEditing(!row.verified_key)
+  }, [row.verified_key])
 
   const mutation = useMutation({
     mutationFn: (newCode: string) => verifyDeposit(row.id, newCode),
     onSuccess: () => {
-      toast.success('Setoran berhasil diverifikasi')
+      toast.success('Kode verifikasi diperbarui')
       queryClient.invalidateQueries({ queryKey: ['deposit'] })
+      setIsEditing(false)
     },
-    onError: () => {
-      toast.error('Gagal memverifikasi setoran')
+    onError: (error: any) => {
+      const msg =
+        error?.response?.data?.message || 'Gagal memverifikasi setoran'
+      toast.error(msg)
     },
   })
 
-  if (row.verified_key) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      if (!code.trim()) {
+        toast.error('Kode verifikasi tidak boleh kosong')
+        return
+      }
+      mutation.mutate(code)
+    }
+  }
+
+  if (!isEditing && row.verified_key) {
     return (
-      <div className="w-full max-w-[120px] truncate bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-mono py-1.5 px-3 rounded text-center mx-auto font-bold">
-        {row.verified_key}
+      <div
+        className="group relative w-full max-w-[140px] mx-auto cursor-pointer"
+        onClick={() => setIsEditing(true)}
+        title="Klik untuk mengubah kode"
+      >
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-mono py-1.5 px-3 rounded text-center font-bold truncate">
+          {row.verified_key}
+        </div>
+
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 rounded transition-opacity bg-emerald-200 border border-emerald-700">
+          <Pencil className="w-3 h-3 text-emerald-800" />
+        </div>
       </div>
     )
   }
@@ -73,21 +102,19 @@ const VerificationCell = ({ row }: { row: DepositRecord }) => {
     <div className="relative max-w-[140px] mx-auto">
       <Input
         placeholder="Input Kode..."
-        className="h-8 text-xs bg-white pr-8"
+        className="h-8 text-xs bg-white pr-8 font-mono"
         value={code}
         onChange={(e) => setCode(e.target.value)}
         disabled={mutation.isPending}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && code.trim()) {
-            mutation.mutate(code)
+        onKeyDown={handleKeyDown}
+        autoFocus={isEditing && !!row.verified_key}
+        onBlur={() => {
+          if (row.verified_key) {
+            setCode(row.verified_key)
+            setIsEditing(false)
           }
         }}
       />
-      {mutation.isPending && (
-        <div className="absolute right-2 top-2">
-          <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
-        </div>
-      )}
     </div>
   )
 }
@@ -206,7 +233,7 @@ const columns: Array<ColumnDef<DepositRecord>> = [
     ),
   },
   {
-    accessorKey: 'verified_key',
+    id: 'verified_key',
     header: 'Kode Verifikasi',
     cell: ({ row }) => <VerificationCell row={row.original} />,
   },
