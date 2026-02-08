@@ -22,7 +22,7 @@ export const Route = createFileRoute('/_auth/toko')({
 function TokoPage() {
   const search = Route.useSearch()
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['toko', search],
     queryFn: () => getTokoList(search),
     placeholderData: (previousData) => previousData,
@@ -33,7 +33,13 @@ function TokoPage() {
   }
 
   if (error) {
-    return <ErrorPage page="toko" />
+    return (
+      <ErrorPage 
+        title="Gagal Memuat Data Toko" 
+        error={error} 
+        reset={refetch} 
+      />
+    )
   }
 
   return (

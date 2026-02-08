@@ -51,14 +51,14 @@ export function TokoDeleteDialog({
         <DialogFooter>
           <Button
             variant="outline"
-            className="md:w-[50%] w-full bg-slate-900 text-white hover:text-white hover:bg-slate-800 h-12"
+            className="md:w-[50%] w-full bg-slate-900 text-white hover:text-white hover:bg-slate-800 h-12 cursor-pointer"
             onClick={() => onOpenChange(false)}
             disabled={isDeleting}
           >
             Batal
           </Button>
           <Button
-            className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12"
+            className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
             onClick={handleConfirm}
             disabled={isDeleting}
           >

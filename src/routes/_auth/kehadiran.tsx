@@ -26,7 +26,7 @@ export const Route = createFileRoute('/_auth/kehadiran')({
 function KehadiranPage() {
   const search = Route.useSearch()
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['attendance', search],
     queryFn: () => getAttendanceList(search),
     placeholderData: (previousData) => previousData,
@@ -37,7 +37,13 @@ function KehadiranPage() {
   }
 
   if (error) {
-    return <ErrorPage page="kehadiran" />
+    return (
+      <ErrorPage 
+        title="Gagal Memuat Data Kehadiran" 
+        error={error} 
+        reset={refetch} 
+      />
+    )
   }
 
   return (

@@ -17,6 +17,7 @@ function ProfilePage() {
     data: user,
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ['profile'],
     queryFn: getProfile,
@@ -27,7 +28,13 @@ function ProfilePage() {
   }
 
   if (error || !user) {
-    return <ErrorPage page="profile" />
+    return (
+      <ErrorPage 
+        title="Gagal Memuat Profil" 
+        error={error} 
+        reset={refetch} 
+      />
+    )
   }
 
   return (

@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_auth/dashboard')({
 })
 
 function DashboardPage() {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['dashboard'],
     queryFn: getDashboardData,
   })
@@ -23,7 +23,13 @@ function DashboardPage() {
   }
 
   if (error) {
-    return <ErrorPage page="dashboard" />
+    return (
+      <ErrorPage 
+        title="Gagal Memuat Dashboard" 
+        error={error} 
+        reset={refetch} 
+      />
+    )
   }
 
   return (

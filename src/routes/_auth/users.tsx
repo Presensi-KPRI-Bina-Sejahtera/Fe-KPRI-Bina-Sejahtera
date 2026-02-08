@@ -23,7 +23,7 @@ export const Route = createFileRoute('/_auth/users')({
 function UsersPage() {
   const search = Route.useSearch()
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['users', search],
     queryFn: () => getUserList(search),
     placeholderData: (previousData) => previousData,
@@ -34,7 +34,13 @@ function UsersPage() {
   }
 
   if (error) {
-    return <ErrorPage page="users" />
+    return (
+      <ErrorPage 
+        title="Gagal Memuat Data Users" 
+        error={error} 
+        reset={refetch} 
+      />
+    )
   }
 
   return (

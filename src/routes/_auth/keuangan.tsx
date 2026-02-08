@@ -26,7 +26,7 @@ export const Route = createFileRoute('/_auth/keuangan')({
 function KeuanganPage() {
   const search = Route.useSearch()
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['cashflow', search],
     queryFn: () => getCashflowList(search),
     placeholderData: (previousData) => previousData,
@@ -37,7 +37,13 @@ function KeuanganPage() {
   }
 
   if (error) {
-    return <ErrorPage page="keuangan" />
+    return (
+      <ErrorPage 
+        title="Gagal Memuat Data Keuangan" 
+        error={error} 
+        reset={refetch} 
+      />
+    )
   }
 
   return (

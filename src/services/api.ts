@@ -3,6 +3,7 @@ import { env } from '@/env'
 
 export const api = axios.create({
   baseURL: env.VITE_API_URL,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
@@ -31,6 +32,11 @@ api.interceptors.response.use(
         }
       }
     }
+
+    if (error.code === 'ECONNABORTED') {
+      console.warn('Request timed out (10s limit exceeded)')
+    }
+
     return Promise.reject(error)
   }
 )

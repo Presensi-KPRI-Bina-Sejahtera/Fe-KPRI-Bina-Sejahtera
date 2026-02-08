@@ -27,7 +27,7 @@ export const Route = createFileRoute('/_auth/setoran')({
 function SetoranPage() {
   const search = Route.useSearch()
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['deposit', search],
     queryFn: () => getDepositList(search),
     placeholderData: (previousData) => previousData,
@@ -38,7 +38,13 @@ function SetoranPage() {
   }
 
   if (error) {
-    return <ErrorPage page="setoran" />
+    return (
+      <ErrorPage 
+        title="Gagal Memuat Data Setoran" 
+        error={error} 
+        reset={refetch} 
+      />
+    )
   }
 
   return (

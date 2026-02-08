@@ -29,7 +29,6 @@ export function TokoEditDialog({
   toko,
 }: TokoEditDialogProps) {
   const queryClient = useQueryClient()
-
   const [coords, setCoords] = useState({ lat: -6.2, lng: 106.816666 })
   const [name, setName] = useState('')
   const [address, setAddress] = useState('')
@@ -108,6 +107,8 @@ export function TokoEditDialog({
     })
   }
 
+  const isFormValid = name.trim() !== '' && address.trim() !== '' && maxDistance > 0
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
@@ -128,7 +129,7 @@ export function TokoEditDialog({
         <div className="grid gap-6 py-4">
           <div className="space-y-2">
             <Label htmlFor="edit-name" className="font-bold text-slate-700">
-              Nama Toko
+              Nama Toko*
             </Label>
             <Input
               id="edit-name"
@@ -145,7 +146,7 @@ export function TokoEditDialog({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-rose-500 font-medium">
                 <MapPin className="size-5" />
-                <span className="text-slate-900">Lokasi Toko</span>
+                <span className="text-slate-900">Lokasi Toko*</span>
               </div>
               {noAddressFound && (
                 <span className="text-xs text-red-500 font-medium">
@@ -162,7 +163,7 @@ export function TokoEditDialog({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-slate-600">Latitude</Label>
+                <Label className="text-slate-600">Latitude*</Label>
                 <Input
                   value={coords.lat}
                   readOnly
@@ -170,7 +171,7 @@ export function TokoEditDialog({
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-600">Longitude</Label>
+                <Label className="text-slate-600">Longitude*</Label>
                 <Input
                   value={coords.lng}
                   readOnly
@@ -181,7 +182,7 @@ export function TokoEditDialog({
 
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <Label className="text-slate-600">Alamat</Label>
+                <Label className="text-slate-600">Alamat*</Label>
                 {isLoadingAddress && (
                   <div className="flex items-center gap-1 text-xs text-blue-500">
                     <Loader2 className="h-3 w-3 animate-spin" />
@@ -201,7 +202,7 @@ export function TokoEditDialog({
 
             <div className="space-y-2">
               <Label className="text-slate-600">
-                Jarak maksimal (m) untuk presensi
+                Jarak maksimal (m) untuk presensi*
               </Label>
               <Input
                 type="number"
@@ -217,16 +218,16 @@ export function TokoEditDialog({
         <DialogFooter>
           <Button
             variant="destructive"
-            className="md:w-[50%] w-full h-12"
+            className="md:w-[50%] w-full h-12 cursor-pointer"
             onClick={() => onOpenChange(false)}
             disabled={mutation.isPending}
           >
             Batal
           </Button>
           <Button
-            className="md:w-[50%] w-full bg-slate-900 text-white hover:bg-slate-800 h-12"
+            className="md:w-[50%] w-full bg-slate-900 text-white hover:bg-slate-800 h-12 cursor-pointer"
             onClick={handleSubmit}
-            disabled={mutation.isPending || isLoadingAddress}
+            disabled={mutation.isPending || isLoadingAddress || !isFormValid}
           >
             {mutation.isPending && (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

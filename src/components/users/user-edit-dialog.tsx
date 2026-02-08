@@ -50,8 +50,8 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
       setName(user.name)
       setUsername(user.username)
       setEmail(user.email)
-      const safeRole = (user.role || "employee").toLowerCase()
-      setRole(safeRole as "admin" | "employee")
+      const safeRole = (user.role || "employee").toLowerCase() as "admin" | "employee"
+      setRole(safeRole)
       setTokoId(user.presence_location_id ? String(user.presence_location_id) : "")
       setFieldErrors({})
     }
@@ -103,11 +103,17 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
       username,
       email,
       role,
-      presence_location_id: tokoId ? Number(tokoId) : null
+      presence_location_id: (role === 'employee' && tokoId) ? Number(tokoId) : null
     })
   }
 
   const isSelf = currentUser?.id === user?.id
+  
+  const isFormValid = 
+    name.trim() !== "" && 
+    username.trim() !== "" && 
+    email.trim() !== "" && 
+    (role === "admin" || (role === "employee" && tokoId !== ""))
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -123,7 +129,7 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="edit-name" className={fieldErrors.name ? "text-red-500" : "text-slate-500"}>
-                Nama Lengkap
+                Nama Lengkap*
               </Label>
               <Input 
                 id="edit-name" 
@@ -139,7 +145,7 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
 
             <div className="grid gap-2">
               <Label htmlFor="edit-username" className={fieldErrors.username ? "text-red-500" : "text-slate-500"}>
-                Username
+                Username*
               </Label>
               <Input 
                 id="edit-username" 
@@ -154,7 +160,7 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
 
             <div className="grid gap-2">
               <Label htmlFor="edit-email" className={fieldErrors.email ? "text-red-500" : "text-slate-500"}>
-                Email
+                Email*
               </Label>
               <Input 
                 id="edit-email" 
@@ -169,25 +175,27 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
               )}
             </div>
 
-            <div className="grid gap-2">
-              <Label className="text-slate-500">Toko</Label>
-              <Select value={tokoId} onValueChange={setTokoId}>
-                <SelectTrigger className="cursor-pointer">
-                  <SelectValue placeholder="Pilih Toko" />
-                </SelectTrigger>
-                <SelectContent>
-                  {tokoList?.map((toko: any) => (
-                    <SelectItem key={toko.id} value={String(toko.id)}>
-                      {toko.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+            {role === "employee" && (
+              <div className="grid gap-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                <Label className="text-slate-500">Toko*</Label>
+                <Select value={tokoId} onValueChange={setTokoId}>
+                  <SelectTrigger className="cursor-pointer">
+                    <SelectValue placeholder="Pilih Toko" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tokoList?.map((toko: any) => (
+                      <SelectItem key={toko.id} value={String(toko.id)}>
+                        {toko.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="grid gap-2">
               <Label className="text-slate-500">
-                Role {isSelf && <span className="text-xs text-amber-600 font-normal ml-2">(Tidak dapat mengubah role sendiri)</span>}
+                Role* {isSelf && <span className="text-xs text-amber-600 font-normal ml-2">(Tidak dapat mengubah role sendiri)</span>}
               </Label>
               <div className="flex items-center gap-3">
                 <button
@@ -204,7 +212,12 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
                 </button>
                 <button
                   type="button"
-                  onClick={() => !isSelf && setRole("admin")}
+                  onClick={() => {
+                    if (!isSelf) {
+                      setRole("admin")
+                      setTokoId("")
+                    }
+                  }}
                   disabled={isSelf}
                   className={`px-4 py-2 rounded-full font-bold text-sm transition-colors cursor-pointer ${
                     role === "admin" 
@@ -230,7 +243,7 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
             <Button 
               type="submit" 
               className="md:w-[50%] w-full bg-slate-900 text-white hover:bg-slate-800 h-12 cursor-pointer"
-              disabled={mutation.isPending}
+              disabled={mutation.isPending || !isFormValid}
             >
               {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Simpan
