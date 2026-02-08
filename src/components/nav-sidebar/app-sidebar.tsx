@@ -1,11 +1,10 @@
 import * as React from 'react'
 import { Link } from '@tanstack/react-router'
 import { LogOut, User } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
 import { navItems } from './nav-data'
 import { SearchBar } from './search-bar'
 import { logout } from '@/services/authService'
-import { getProfile } from '@/services/profileService'
+import { useUserProfile } from '@/hooks/use-user-profile'
 import {
   Sidebar,
   SidebarContent,
@@ -23,11 +22,7 @@ export function AppSidebar({
   pathname,
   ...props
 }: React.ComponentProps<typeof Sidebar> & { pathname: string }) {
-  const { data: user } = useQuery({
-    queryKey: ['profile'],
-    queryFn: getProfile,
-    staleTime: 1000 * 60 * 5,
-  })
+  const { data: user } = useUserProfile()
 
   const getInitials = (name: string) => {
     return (name || 'User')

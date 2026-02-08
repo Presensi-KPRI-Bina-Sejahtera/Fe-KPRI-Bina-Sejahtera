@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router"
-import { useQuery } from "@tanstack/react-query"
 import {
   ChevronDown,
   LogOut,
@@ -21,14 +20,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { logout } from "@/services/authService"
-import { getProfile } from "@/services/profileService"
+import { useUserProfile } from "@/hooks/use-user-profile"
 
 export function UserNav() {
-  const { data: user } = useQuery({
-    queryKey: ['profile'],
-    queryFn: getProfile,
-    staleTime: 1000 * 60 * 5, 
-  })
+  const { data: user } = useUserProfile()
 
   const getInitials = (name: string) => {
     return (name || 'User')

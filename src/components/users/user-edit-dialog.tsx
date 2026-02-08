@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { getTokoDropdown, updateUser } from "@/services/userService"
+import { useUserProfile } from "@/hooks/use-user-profile"
 
 interface UserEditDialogProps {
   open: boolean
@@ -31,7 +32,7 @@ interface UserEditDialogProps {
 
 export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps) {
   const queryClient = useQueryClient()
-  
+  const { data: currentUser } = useUserProfile()
   const [name, setName] = useState("")
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
@@ -49,7 +50,8 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
       setName(user.name)
       setUsername(user.username)
       setEmail(user.email)
-      setRole(user.role as "admin" | "employee")
+      const safeRole = (user.role || "employee").toLowerCase()
+      setRole(safeRole as "admin" | "employee")
       setTokoId(user.presence_location_id ? String(user.presence_location_id) : "")
       setFieldErrors({})
     }
@@ -57,9 +59,15 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
 
   const mutation = useMutation({
     mutationFn: (data: any) => updateUser(user!.id, data),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       toast.success("User berhasil diperbarui")
       queryClient.invalidateQueries({ queryKey: ["users"] })
+      if (currentUser && currentUser.id === user?.id) {
+        queryClient.invalidateQueries({ queryKey: ["profile"] })
+        const updatedUser = { ...currentUser, ...variables }
+        localStorage.setItem("user", JSON.stringify(updatedUser))
+      }
+
       onOpenChange(false)
       setFieldErrors({})
     },
@@ -98,6 +106,8 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
       presence_location_id: tokoId ? Number(tokoId) : null
     })
   }
+
+  const isSelf = currentUser?.id === user?.id
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -176,27 +186,31 @@ export function UserEditDialog({ open, onOpenChange, user }: UserEditDialogProps
             </div>
 
             <div className="grid gap-2">
-              <Label className="text-slate-500">Role</Label>
+              <Label className="text-slate-500">
+                Role {isSelf && <span className="text-xs text-amber-600 font-normal ml-2">(Tidak dapat mengubah role sendiri)</span>}
+              </Label>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => setRole("employee")}
+                  onClick={() => !isSelf && setRole("employee")}
+                  disabled={isSelf}
                   className={`px-4 py-2 rounded-full font-bold text-sm transition-colors ${
                     role === "employee" 
                       ? "bg-amber-100 text-amber-600 border-2 border-amber-200" 
                       : "bg-slate-100 text-slate-400 border border-transparent hover:bg-slate-200"
-                  }`}
+                  } ${isSelf ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
                   Pegawai
                 </button>
                 <button
                   type="button"
-                  onClick={() => setRole("admin")}
+                  onClick={() => !isSelf && setRole("admin")}
+                  disabled={isSelf}
                   className={`px-4 py-2 rounded-full font-bold text-sm transition-colors ${
                     role === "admin" 
                       ? "bg-rose-100 text-rose-600 border-2 border-rose-200" 
                       : "bg-slate-100 text-slate-400 border border-transparent hover:bg-slate-200"
-                  }`}
+                  } ${isSelf ? "opacity-50 cursor-not-allowed" : ""}`}
                 >
                   Admin
                 </button>
