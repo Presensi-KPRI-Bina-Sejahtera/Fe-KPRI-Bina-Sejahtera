@@ -62,6 +62,7 @@ export function DataTablePagination({
             size="icon"
             onClick={() => onPageChange(pageIndex - 1)}
             disabled={pageIndex <= 0}
+            className="cursor-pointer"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -76,7 +77,7 @@ export function DataTablePagination({
                 key={idx}
                 variant={pageIndex === idx ? 'secondary' : 'ghost'}
                 size="sm"
-                className={`h-8 w-8 font-bold ${
+                className={`h-8 w-8 font-bold cursor-pointer ${
                   pageIndex === idx ? 'text-slate-900' : 'text-muted-foreground'
                 }`}
                 onClick={() => onPageChange(idx)}
@@ -91,6 +92,7 @@ export function DataTablePagination({
             size="icon"
             onClick={() => onPageChange(pageIndex + 1)}
             disabled={pageIndex >= pageCount - 1}
+            className="cursor-pointer"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -100,7 +102,7 @@ export function DataTablePagination({
           value={`${pageSize}`}
           onValueChange={(value) => onPageSizeChange(Number(value))}
         >
-          <SelectTrigger className="h-8 md:w-27.5 w-auto bg-slate-100 border-none">
+          <SelectTrigger className="h-8 md:w-27.5 w-auto bg-slate-100 border-none cursor-pointer">
             <SelectValue placeholder={`${pageSize} / Page`} />
           </SelectTrigger>
           <SelectContent side="top">

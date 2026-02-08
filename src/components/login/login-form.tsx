@@ -187,7 +187,7 @@ export function LoginForm({
                 {/* Ini untuk yang login biasa */}
                 <Button
                   type="submit"
-                  className="font-bold bg-primary p-6"
+                  className="font-bold bg-primary p-6 cursor-pointer"
                   disabled={isLoading}
                 >
                   {isLoading ? (

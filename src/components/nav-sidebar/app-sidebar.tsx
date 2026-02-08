@@ -131,7 +131,7 @@ export function AppSidebar({
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              className="bg-[#E11D48] hover:bg-[#BE123C] text-white group-data-[collapsible=icon]:!p-2.5"
+              className="bg-[#E11D48] hover:bg-[#BE123C] text-white hover:text-white group-data-[collapsible=icon]:!p-2.5 cursor-pointer"
               onClick={logout}
             >
               <LogOut />

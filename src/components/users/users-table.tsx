@@ -6,11 +6,12 @@ import {
 } from "@tanstack/react-table"
 import { useNavigate } from "@tanstack/react-router"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { ArrowUpDown, ChevronLeft, ChevronRight, Pencil, Trash2 } from "lucide-react"
+import { ArrowUpDown, Pencil, Trash2 } from "lucide-react"
 import { toast } from "sonner"
 import { UserDeleteDialog } from "./user-delete-dialog"
 import { UserEditDialog } from "./user-edit-dialog"
 import type { ColumnDef, SortingState } from "@tanstack/react-table"
+import { DataTablePagination } from "@/components/data-table-pagination"
 
 import type { UserRecord } from "@/services/userService"
 import {
@@ -25,13 +26,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 
 import { deleteUser } from "@/services/userService"
 
@@ -98,7 +92,7 @@ export function UsersTable({ data, pagination }: UsersTableProps) {
       header: ({ column }) => (
         <Button
           variant="ghost"
-          className="p-0 hover:bg-transparent font-bold text-slate-900 justify-start"
+          className="p-0 hover:bg-transparent font-bold text-slate-900 justify-start cursor-pointer"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Karyawan
@@ -157,7 +151,7 @@ export function UsersTable({ data, pagination }: UsersTableProps) {
           <Button 
             variant="ghost" 
             size="icon" 
-            className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50"
+            className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
             onClick={() => setUserToEdit(row.original)}
           >
             <Pencil className="h-4 w-4" />
@@ -166,7 +160,7 @@ export function UsersTable({ data, pagination }: UsersTableProps) {
           <Button 
             variant="ghost" 
             size="icon" 
-            className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+            className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
             onClick={() => setUserToDelete(row.original)}
           >
             <Trash2 className="h-4 w-4" />
@@ -184,35 +178,6 @@ export function UsersTable({ data, pagination }: UsersTableProps) {
     manualPagination: true,
     pageCount: pagination.pageCount,
   })
-
-  const { pageIndex } = pagination
-  const { pageCount } = pagination
-  const getPageNumbers = () => {
-    const pages = []
-    const maxVisible = 5
-    if (pageCount <= maxVisible) {
-      for (let i = 0; i < pageCount; i++) pages.push(i)
-    } else {
-      if (pageIndex < 3) {
-        for (let i = 0; i < 4; i++) pages.push(i)
-        pages.push(-1)
-        pages.push(pageCount - 1)
-      } else if (pageIndex > pageCount - 4) {
-        pages.push(0)
-        pages.push(-1)
-        for (let i = pageCount - 4; i < pageCount; i++) pages.push(i)
-      } else {
-        pages.push(0)
-        pages.push(-1)
-        pages.push(pageIndex - 1)
-        pages.push(pageIndex)
-        pages.push(pageIndex + 1)
-        pages.push(-1)
-        pages.push(pageCount - 1)
-      }
-    }
-    return pages
-  }
 
   return (
     <>
@@ -259,49 +224,13 @@ export function UsersTable({ data, pagination }: UsersTableProps) {
             </TableBody>
           </Table>
 
-          <div className="flex items-center justify-center p-4 border-t">
-            <div className="grid md:grid-cols-2 grid-cols-1 gap-6">
-              <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="icon" onClick={() => handlePageChange(pageIndex - 1)} disabled={pageIndex <= 0}>
-                      <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  {getPageNumbers().map((idx, i) => (
-                    idx === -1 ? (
-                      <span key={`dots-${i}`} className="px-2 text-muted-foreground">...</span>
-                    ) : (
-                      <Button
-                        key={idx}
-                        variant={pageIndex === idx ? "secondary" : "ghost"}
-                        size="sm"
-                        className={`h-8 w-8 font-bold ${pageIndex === idx ? "text-slate-900" : "text-muted-foreground"}`}
-                        onClick={() => handlePageChange(idx)}
-                      >
-                        {idx + 1}
-                      </Button>
-                    )
-                  ))}
-                  <Button variant="ghost" size="icon" onClick={() => handlePageChange(pageIndex + 1)} disabled={pageIndex >= pageCount - 1}>
-                      <ChevronRight className="h-4 w-4" />
-                  </Button>
-              </div>
-
-              <Select
-                  value={`${pagination.pageSize}`}
-                  onValueChange={(value) => handlePageSizeChange(Number(value))}
-              >
-                  <SelectTrigger className="h-8 md:w-27.5 w-auto bg-slate-100 border-none">
-                      <SelectValue placeholder={`${pagination.pageSize} / Page`} />
-                  </SelectTrigger>
-                  <SelectContent side="top">
-                      {[10, 20, 30, 40, 50].map((pageSize) => (
-                          <SelectItem key={pageSize} value={`${pageSize}`}>
-                          {pageSize} / Page
-                          </SelectItem>
-                      ))}
-                  </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <DataTablePagination
+            pageIndex={pagination.pageIndex}
+            pageCount={pagination.pageCount}
+            pageSize={pagination.pageSize}
+            onPageChange={handlePageChange}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </CardContent>
       </Card>
 

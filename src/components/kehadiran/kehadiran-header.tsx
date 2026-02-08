@@ -58,7 +58,7 @@ export function KehadiranHeader({ currentFilters }: KehadiranHeaderProps) {
         </p>
       </div>
       <Button 
-        className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2 h-12"
+        className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2 h-12 cursor-pointer"
         onClick={handleExport}
         disabled={isExporting}
       >

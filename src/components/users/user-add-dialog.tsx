@@ -98,7 +98,7 @@ export function UserAddDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2 h-12 font-bold">
+        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2 h-12 font-bold cursor-pointer">
           <Plus className="h-4 w-4" />
           Tambah User
         </Button>
@@ -167,7 +167,7 @@ export function UserAddDialog() {
             <div className="grid gap-2">
               <Label className="text-slate-500">Toko</Label>
               <Select value={tokoId} onValueChange={setTokoId}>
-                <SelectTrigger>
+                <SelectTrigger className="cursor-pointer">
                   <SelectValue placeholder="Pilih Toko" />
                 </SelectTrigger>
                 <SelectContent>
@@ -186,7 +186,7 @@ export function UserAddDialog() {
                 <button
                   type="button"
                   onClick={() => setRole("employee")}
-                  className={`px-4 py-2 rounded-full font-bold text-sm transition-colors ${
+                  className={`px-4 py-2 rounded-full font-bold text-sm transition-colors cursor-pointer ${
                     role === "employee" 
                       ? "bg-amber-100 text-amber-600 border-2 border-amber-200" 
                       : "bg-slate-100 text-slate-400 border border-transparent hover:bg-slate-200"
@@ -197,7 +197,7 @@ export function UserAddDialog() {
                 <button
                   type="button"
                   onClick={() => setRole("admin")}
-                  className={`px-4 py-2 rounded-full font-bold text-sm transition-colors ${
+                  className={`px-4 py-2 rounded-full font-bold text-sm transition-colors cursor-pointer ${
                     role === "admin" 
                       ? "bg-rose-100 text-rose-600 border-2 border-rose-200" 
                       : "bg-slate-100 text-slate-400 border border-transparent hover:bg-slate-200"
@@ -213,14 +213,14 @@ export function UserAddDialog() {
             <Button 
               type="button" 
               variant="destructive" 
-              className="md:w-[50%] w-full h-12"
+              className="md:w-[50%] w-full h-12 cursor-pointer"
               onClick={() => setOpen(false)}
             >
               Batal
             </Button>
             <Button 
               type="submit" 
-              className="md:w-[50%] w-full bg-slate-900 text-white hover:bg-slate-800 h-12"
+              className="md:w-[50%] w-full bg-slate-900 text-white hover:bg-slate-800 h-12 cursor-pointer"
               disabled={mutation.isPending}
             >
               {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

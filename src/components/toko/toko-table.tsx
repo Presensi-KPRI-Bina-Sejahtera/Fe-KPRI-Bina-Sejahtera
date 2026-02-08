@@ -92,7 +92,7 @@ export function TokoTable({ data, pagination }: TokoTableProps) {
       header: ({ column }) => (
         <Button
           variant="ghost"
-          className="p-0 hover:bg-transparent font-bold text-slate-900 justify-start"
+          className="p-0 hover:bg-transparent font-bold text-slate-900 justify-start cursor-pointer"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
           Nama Toko
@@ -156,7 +156,7 @@ export function TokoTable({ data, pagination }: TokoTableProps) {
         row.original.maps ? (
           <Button
             size="sm"
-            className="bg-blue-500 hover:bg-blue-600 text-white gap-1.5 h-8 px-3"
+            className="bg-blue-500 hover:bg-blue-600 text-white gap-1.5 h-8 px-3 cursor-pointer"
             onClick={() => window.open(row.original.maps, '_blank')}
           >
             <MapPin className="h-3.5 w-3.5" />
@@ -174,7 +174,7 @@ export function TokoTable({ data, pagination }: TokoTableProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50"
+            className="h-8 w-8 text-amber-500 hover:text-amber-600 hover:bg-amber-50 cursor-pointer"
             onClick={() => setTokoToEdit(row.original)}
           >
             <Pencil className="h-4 w-4" />
@@ -183,7 +183,7 @@ export function TokoTable({ data, pagination }: TokoTableProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+            className="h-8 w-8 text-rose-500 hover:text-rose-600 hover:bg-rose-50 cursor-pointer"
             onClick={() => setTokoToDelete(row.original)}
           >
             <Trash2 className="h-4 w-4" />

@@ -41,9 +41,9 @@ export function UserDeleteDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting} className="md:w-[50%] w-full bg-slate-900 text-white hover:text-white hover:bg-slate-800 h-12">Batal</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeleting} className="md:w-[50%] w-full bg-slate-900 text-white hover:text-white hover:bg-slate-800 h-12 cursor-pointer">Batal</AlertDialogCancel>
           <AlertDialogAction 
-            className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12"
+            className="bg-rose-600 hover:bg-rose-700 md:w-[50%] w-full h-12 cursor-pointer"
             onClick={(e) => {
               e.preventDefault()
               if (user) onConfirm(user.id)

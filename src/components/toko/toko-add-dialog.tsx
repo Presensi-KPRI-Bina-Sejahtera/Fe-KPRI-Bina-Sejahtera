@@ -89,7 +89,7 @@ export function TokoAddDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2 shadow-lg h-12">
+        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white gap-2 shadow-lg h-12 cursor-pointer">
           <Plus className="h-4 w-4" />
           Tambah Toko
         </Button>
