@@ -185,7 +185,7 @@ export function KeuanganTable({ data, pagination }: KeuanganTableProps) {
   })
 
   return (
-    <Card className="shadow-lg border-3 border-slate-200">
+    <Card className="shadow-lg border-3 border-slate-200 p-0">
       <CardContent className="p-0">
         <Table>
           <TableHeader className="bg-slate-50/50">

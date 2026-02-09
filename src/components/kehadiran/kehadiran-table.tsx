@@ -160,7 +160,7 @@ export function KehadiranTable({ data, pagination }: KehadiranTableProps) {
   })
 
   return (
-    <Card className="shadow-lg border-slate-200 border-3">
+    <Card className="shadow-lg border-slate-200 border-3 p-0">
       <CardContent className="p-0">
         <Table>
           <TableHeader className="bg-slate-50/50">

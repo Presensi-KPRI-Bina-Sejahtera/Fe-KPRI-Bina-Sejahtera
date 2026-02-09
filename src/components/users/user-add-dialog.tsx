@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Loader2, Plus } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -41,7 +41,7 @@ export function UserAddDialog() {
   const [email, setEmail] = useState("")
   const [tokoId, setTokoId] = useState("")
   const [role, setRole] = useState<"admin" | "employee">("employee")
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
+  const [fieldErrors, setFieldErrors] = useState<Record<string, Array<string>>>({})
 
   const { data: tokoList } = useQuery({
     queryKey: ['toko-dropdown'],

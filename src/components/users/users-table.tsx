@@ -11,9 +11,9 @@ import { toast } from "sonner"
 import { UserDeleteDialog } from "./user-delete-dialog"
 import { UserEditDialog } from "./user-edit-dialog"
 import type { ColumnDef, SortingState } from "@tanstack/react-table"
+import type { UserRecord } from "@/services/userService"
 import { DataTablePagination } from "@/components/data-table-pagination"
 
-import type { UserRecord } from "@/services/userService"
 import {
   Table,
   TableBody,

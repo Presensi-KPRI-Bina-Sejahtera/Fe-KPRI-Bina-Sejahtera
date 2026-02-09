@@ -87,30 +87,31 @@ export function KeuanganFilters({
   return (
     <Card className="shadow-lg border-3 border-slate-200">
       <CardContent className="p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <div className="lg:col-span-2 space-y-2">
-          <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">
-            Rentang Tanggal
+        <div className="space-y-2">
+          <Label className="text-sm text-muted-foreground">Tanggal Mulai</Label>
+          <div className="relative">
+            <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="date"
+              className="pl-9"
+              value={filters.start_date || ''}
+              onChange={(e) => applyFilter('start_date', e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label className="text-sm text-muted-foreground">
+            Tanggal Selesai
           </Label>
-          <div className="flex items-center gap-2">
-            <div className="relative w-full">
-              <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="date"
-                className="pl-10"
-                value={filters.start_date || ''}
-                onChange={(e) => applyFilter('start_date', e.target.value)}
-              />
-            </div>
-            <span className="text-muted-foreground">-</span>
-            <div className="relative w-full">
-              <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="date"
-                className="pl-10"
-                value={filters.end_date || ''}
-                onChange={(e) => applyFilter('end_date', e.target.value)}
-              />
-            </div>
+          <div className="relative">
+            <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="date"
+              className="pl-9"
+              value={filters.end_date || ''}
+              onChange={(e) => applyFilter('end_date', e.target.value)}
+            />
           </div>
         </div>
 

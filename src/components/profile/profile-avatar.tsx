@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Camera, Loader2, AlertCircle } from 'lucide-react'
+import { AlertCircle, Camera, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { ProfileData } from '@/services/profileService'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Eye, EyeOff, Loader2, Lock, KeyRound, AlertCircle } from 'lucide-react'
+import { AlertCircle, Eye, EyeOff, KeyRound, Loader2, Lock } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -21,7 +21,7 @@ export function ProfilePassword({ hasPassword }: ProfilePasswordProps) {
   const [currentPassword, setCurrentPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
+  const [fieldErrors, setFieldErrors] = useState<Record<string, Array<string>>>({})
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -66,7 +66,7 @@ export function ProfilePassword({ hasPassword }: ProfilePasswordProps) {
     e.preventDefault()
     setFieldErrors({})
 
-    const errors: Record<string, string[]> = {}
+    const errors: Record<string, Array<string>> = {}
 
     if (hasPassword && !currentPassword) {
       errors.current_password = ['Kata sandi saat ini harus diisi']

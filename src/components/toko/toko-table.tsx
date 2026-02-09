@@ -2,6 +2,7 @@ import * as React from 'react'
 import {
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 import { useNavigate } from '@tanstack/react-router'
@@ -197,6 +198,8 @@ export function TokoTable({ data, pagination }: TokoTableProps) {
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(), 
+    onSortingChange: setSorting,
     state: { sorting },
     manualPagination: true,
     pageCount: pagination.pageCount,

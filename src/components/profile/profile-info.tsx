@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Loader2, Mail, Save, User, AlertCircle } from 'lucide-react'
+import { AlertCircle, Loader2, Mail, Save, User } from 'lucide-react'
 import { toast } from 'sonner'
 import type { ProfileData } from '@/services/profileService'
 import { Button } from '@/components/ui/button'
@@ -18,7 +18,7 @@ export function ProfileInfo({ user }: ProfileInfoProps) {
   const queryClient = useQueryClient()
   const [name, setName] = useState(user.name)
   const [email, setEmail] = useState(user.email)
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
+  const [fieldErrors, setFieldErrors] = useState<Record<string, Array<string>>>({})
 
   useEffect(() => {
     setName(user.name)

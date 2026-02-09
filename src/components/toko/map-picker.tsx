@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from 'react-leaflet'
-import { Search, Loader2, MapPin } from 'lucide-react'
+import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
+import { Loader2, MapPin, Search } from 'lucide-react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
-import { Input } from '@/components/ui/input'
-import { cn } from '@/lib/utils'
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png'
 import markerIcon from 'leaflet/dist/images/marker-icon.png'
 import markerShadow from 'leaflet/dist/images/marker-shadow.png'
+import { cn } from '@/lib/utils'
+import { Input } from '@/components/ui/input'
 
 delete (L.Icon.Default.prototype as any)._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -49,7 +49,7 @@ function LocationMarker({ lat, lng, onLocationSelect }: MapPickerProps) {
 export function MapPicker({ lat, lng, onLocationSelect, className }: MapPickerProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [isSearching, setIsSearching] = useState(false)
-  const [suggestions, setSuggestions] = useState<NominatimSearchResult[]>([])
+  const [suggestions, setSuggestions] = useState<Array<NominatimSearchResult>>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   
   const suggestTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
