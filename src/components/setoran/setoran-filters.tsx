@@ -128,7 +128,6 @@ export function SetoranFilters({
                   onChange={(e) => applyFilter('start_date', e.target.value)}
                 />
               </div>
-              <span className="text-muted-foreground hidden sm:inline">-</span>
               <div className="relative w-full">
                 <Calendar className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input

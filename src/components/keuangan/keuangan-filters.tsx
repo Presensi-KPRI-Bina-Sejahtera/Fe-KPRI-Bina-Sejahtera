@@ -86,7 +86,7 @@ export function KeuanganFilters({
 
   return (
     <Card className="shadow-lg border-3 border-slate-200">
-      <CardContent className="p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <CardContent className="p-6 grid grid-cols-1 lg:grid-cols-4 sm:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label className="text-sm text-muted-foreground">Tanggal Mulai</Label>
           <div className="relative">

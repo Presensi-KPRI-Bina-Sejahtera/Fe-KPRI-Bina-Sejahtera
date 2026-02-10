@@ -94,7 +94,7 @@ export function KehadiranFilters({
 
   return (
     <Card className="border-3 border-slate-200 shadow-lg">
-      <CardContent className="px-6 py-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+      <CardContent className="px-6 py-6 grid grid-cols-1 md:grid-cols-4 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label className="text-sm text-muted-foreground">Tanggal Mulai</Label>
           <div className="relative">
