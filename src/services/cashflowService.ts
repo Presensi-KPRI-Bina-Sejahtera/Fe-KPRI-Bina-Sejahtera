@@ -19,6 +19,7 @@ export type CashflowRecord = {
   type: 'pemasukan' | 'pengeluaran'
   date: string
   value: number
+  keterangan: string | null
 }
 
 export type CashflowResponse = {

@@ -145,6 +145,15 @@ const columns: Array<ColumnDef<CashflowRecord>> = [
       )
     },
   },
+  {
+    accessorKey: 'keterangan',
+    header: 'Keterangan',
+    cell: ({ row }) => (
+      <span className="text-slate-600 text-sm">
+        {row.original.keterangan || '-'}
+      </span>
+    ),
+  },
 ]
 
 export function KeuanganTable({ data, pagination }: KeuanganTableProps) {
