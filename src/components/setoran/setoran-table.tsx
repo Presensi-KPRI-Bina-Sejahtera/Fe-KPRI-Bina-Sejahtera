@@ -109,10 +109,20 @@ const VerificationCell = ({ row }: { row: DepositRecord }) => {
         onKeyDown={handleKeyDown}
         autoFocus={isEditing && !!row.verified_key}
         onBlur={() => {
-          if (row.verified_key) {
-            setCode(row.verified_key)
-            setIsEditing(false)
+          if (mutation.isPending) return
+
+          const trimmed = code.trim()
+
+          if (!trimmed) {
+            return
           }
+
+          if (row.verified_key && trimmed === row.verified_key) {
+            setIsEditing(false)
+            return
+          }
+
+          mutation.mutate(trimmed)
         }}
       />
     </div>
